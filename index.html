@@ -1,0 +1,2270 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Belajar & Simulasi SAS 1 - SD Katolik Santa Clara Surabaya</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Javanese&family=Noto+Sans+SC:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        jawa: ['Noto Sans Javanese', 'sans-serif'],
+                        mandarin: ['Noto Sans SC', 'sans-serif'],
+                    },
+                    colors: {
+                        sanclar: {
+                            blue: '#0f2c59',
+                            lightBlue: '#1e4b8f',
+                            gold: '#eab308',
+                            darkGold: '#ca8a04',
+                            cream: '#f8fafc'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #f1f5f9;
+            color: #1e293b;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+        .exam-browser-frame {
+            border: 6px solid #0f2c59;
+            box-shadow: 0 25px 50px -12px rgba(15, 44, 89, 0.25);
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col font-sans antialiased">
+
+    <!-- Top Notification / Message Box (Replaces alert/confirm) -->
+    <div id="customModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 transform transition-all">
+            <div class="flex items-center gap-3 mb-3">
+                <div id="modalIcon" class="w-10 h-10 rounded-full bg-blue-100 text-sanclar-blue flex items-center justify-center text-lg">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+                <h3 id="modalTitle" class="text-lg font-bold text-slate-800">Konfirmasi</h3>
+            </div>
+            <p id="modalMessage" class="text-slate-600 text-sm leading-relaxed mb-6">Pesan informasi.</p>
+            <div id="modalActions" class="flex justify-end gap-3">
+                <button id="modalCancelBtn" class="px-4 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition">Batal</button>
+                <button id="modalConfirmBtn" class="px-5 py-2 rounded-xl text-sm font-semibold bg-sanclar-blue text-white hover:bg-sanclar-lightBlue transition shadow-md">Ya, Lanjutkan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header Navigation -->
+    <header id="mainHeader" class="bg-gradient-to-r from-sanclar-blue via-[#163d7a] to-sanclar-blue text-white shadow-lg sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 rounded-xl bg-sanclar-gold text-sanclar-blue flex items-center justify-center font-extrabold text-xl shadow-inner shrink-0">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-bold uppercase tracking-wider bg-sanclar-gold/20 text-sanclar-gold px-2 py-0.5 rounded-md border border-sanclar-gold/30">SAS 1 • TA 2026/2027</span>
+                            <span class="text-xs text-blue-200 hidden sm:inline">Kelas VI</span>
+                        </div>
+                        <h1 class="text-base sm:text-lg font-bold tracking-tight leading-tight mt-0.5">SD Katolik Santa Clara Surabaya</h1>
+                    </div>
+                </div>
+
+                <!-- Navigation Tabs -->
+                <nav class="flex flex-wrap items-center gap-1.5 bg-slate-900/30 p-1.5 rounded-xl border border-white/10">
+                    <button onclick="switchMainTab('jadwal')" id="nav-jadwal" class="nav-btn px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 bg-sanclar-gold text-sanclar-blue shadow">
+                        <i class="fas fa-calendar-alt"></i> <span>Jadwal & Info</span>
+                    </button>
+                    <button onclick="switchMainTab('belajar')" id="nav-belajar" class="nav-btn px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 text-blue-100 hover:bg-white/10">
+                        <i class="fas fa-book-open"></i> <span>Materi & Trik Hafal</span>
+                    </button>
+                    <button onclick="switchMainTab('kuis')" id="nav-kuis" class="nav-btn px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 text-blue-100 hover:bg-white/10">
+                        <i class="fas fa-bolt"></i> <span>Kuis Singkat (PG)</span>
+                    </button>
+                    <button onclick="switchMainTab('ujian')" id="nav-ujian" class="nav-btn px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 text-blue-100 hover:bg-white/10">
+                        <i class="fas fa-laptop-code"></i> <span>Simulasi SAS (AI)</span>
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- ==================== TAB 1: JADWAL & INFO SAS ==================== -->
+        <section id="tab-jadwal" class="tab-content space-y-6">
+            <!-- Hero Banner -->
+            <div class="bg-gradient-to-br from-sanclar-blue to-sanclar-lightBlue rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
+                <div class="absolute right-0 top-0 w-64 h-64 bg-sanclar-gold/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
+                <div class="relative z-10 max-w-3xl">
+                    <span class="inline-block px-3 py-1 rounded-full bg-sanclar-gold text-sanclar-blue text-xs font-extrabold uppercase tracking-wider mb-3">
+                        Semangat Belajar Kelas VI!
+                    </span>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold mb-3 leading-tight">
+                        Persiapan Sumatif Akhir Semester (SAS) 1
+                    </h2>
+                    <p class="text-blue-100 text-sm sm:text-base leading-relaxed mb-6">
+                        Halo anak-anak Kelas VI SD Katolik Santa Clara! Gunakan portal ini untuk mempelajari ringkasan materi 8 mata pelajaran, menguasai trik hafalan cepat, berlatih kuis pilihan ganda, dan mencoba simulasi Exam Browser SAS lengkap dengan koreksi AI!
+                    </p>
+                    <div class="flex flex-wrap gap-3">
+                        <button onclick="switchMainTab('belajar')" class="px-5 py-2.5 rounded-xl bg-sanclar-gold text-sanclar-blue font-bold text-sm hover:bg-yellow-400 transition shadow-lg flex items-center gap-2">
+                            <i class="fas fa-book-reader"></i> Mulai Belajar Materi
+                        </button>
+                        <button onclick="switchMainTab('ujian')" class="px-5 py-2.5 rounded-xl bg-white/15 hover:bg-white/25 text-white font-semibold text-sm border border-white/25 transition flex items-center gap-2">
+                            <i class="fas fa-desktop"></i> Coba Simulasi Exam Browser
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Tabel Jadwal SAS -->
+                <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="bg-slate-50 px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-base sm:text-lg">Jadwal dan Bahan SAS 1 Kelas VI</h3>
+                            <p class="text-xs text-slate-500">Tahun Ajaran 2026/2027 • No. Dok: FRM.KR.70</p>
+                        </div>
+                        <span class="text-xs font-semibold bg-blue-100 text-sanclar-blue px-3 py-1 rounded-full">8 Mapel</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead>
+                                <tr class="bg-sanclar-blue text-white text-xs uppercase tracking-wider">
+                                    <th class="py-3 px-4">No</th>
+                                    <th class="py-3 px-4">Hari / Tanggal</th>
+                                    <th class="py-3 px-4">Waktu</th>
+                                    <th class="py-3 px-4">Mata Pelajaran</th>
+                                    <th class="py-3 px-4">Bahan Ujian</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200 text-slate-700">
+                                <tr class="hover:bg-blue-50/50 transition">
+                                    <td class="py-3 px-4 font-semibold">1</td>
+                                    <td class="py-3 px-4 font-medium">Rabu, 18 Nov 2026</td>
+                                    <td class="py-3 px-4 text-xs text-slate-500">Sesuai jam kelas</td>
+                                    <td class="py-3 px-4 font-bold text-sanclar-blue">Mandarin</td>
+                                    <td class="py-3 px-4">Bab 1 & 2</td>
+                                </tr>
+                                <tr class="hover:bg-blue-50/50 transition bg-slate-50/50">
+                                    <td class="py-3 px-4 font-semibold" rowspan="2">2</td>
+                                    <td class="py-3 px-4 font-medium" rowspan="2">Senin, 23 Nov 2026</td>
+                                    <td class="py-3 px-4 text-xs font-semibold text-slate-600">07.00 - 08.30</td>
+                                    <td class="py-3 px-4 font-bold text-sanclar-blue">Bahasa Jawa</td>
+                                    <td class="py-3 px-4">Aksara Jawa dan Geguritan</td>
+                                </tr>
+                                <tr class="hover:bg-blue-50/50 transition bg-slate-50/50">
+                                    <td class="py-3 px-4 text-xs font-semibold text-slate-600">09.00 - 11.00</td>
+                                    <td class="py-3 px-4 font-bold text-sanclar-blue">IPAS</td>
+                                    <td class="py-3 px-4">Bab 4: Kearifan lokal, warisan leluhur untuk persatuan bangsa</td>
+                                </tr>
+                                <tr class="hover:bg-blue-50/50 transition">
+                                    <td class="py-3 px-4 font-semibold" rowspan="2">3</td>
+                                    <td class="py-3 px-4 font-medium" rowspan="2">Selasa, 24 Nov 2026</td>
+                                    <td class="py-3 px-4 text-xs font-semibold text-slate-600">07.00 - 08.30</td>
+                                    <td class="py-3 px-4 font-bold text-sanclar-blue">Agama</td>
+                                    <td class="py-3 px-4">Bab II (B, C, dan D)</td>
+                                </tr>
+                                <tr class="hover:bg-blue-50/50 transition">
+                                    <td class="py-3 px-4 text-xs font-semibold text-slate-600">09.00 - 11.00</td>
+                                    <td class="py-3 px-4 font-bold text-sanclar-blue">Bahasa Indonesia</td>
+                                    <td class="py-3 px-4">Bab 4: Formulir, Jenis-Jenis Teks, dan Kalimat Majemuk</td>
+                                </tr>
+                                <tr class="hover:bg-blue-50/50 transition bg-slate-50/50">
+                                    <td class="py-3 px-4 font-semibold" rowspan="2">4</td>
+                                    <td class="py-3 px-4 font-medium" rowspan="2">Rabu, 25 Nov 2026</td>
+                                    <td class="py-3 px-4 text-xs font-semibold text-slate-600">07.00 - 08.30</td>
+                                    <td class="py-3 px-4 font-bold text-sanclar-blue">Pendidikan Pancasila</td>
+                                    <td class="py-3 px-4">• Hak dan Kewajiban<br>• Musyawarah</td>
+                                </tr>
+                                <tr class="hover:bg-blue-50/50 transition bg-slate-50/50">
+                                    <td class="py-3 px-4 text-xs font-semibold text-slate-600">09.00 - 10.30</td>
+                                    <td class="py-3 px-4 font-bold text-sanclar-blue">Bahasa Inggris</td>
+                                    <td class="py-3 px-4">Unit 4 and Unit 5 (Vocabulary + Grammar)</td>
+                                </tr>
+                                <tr class="hover:bg-blue-50/50 transition">
+                                    <td class="py-3 px-4 font-semibold">5</td>
+                                    <td class="py-3 px-4 font-medium">Kamis, 26 Nov 2026</td>
+                                    <td class="py-3 px-4 text-xs font-semibold text-slate-600">07.00 - 09.00</td>
+                                    <td class="py-3 px-4 font-bold text-sanclar-blue">Matematika</td>
+                                    <td class="py-3 px-4">• Keliling dan Luas Bangun Datar<br>• Luas bangun datar gabungan</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Checklist Perlengkapan SAS -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-2.5 text-sanclar-blue font-bold text-base mb-4">
+                            <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center">
+                                <i class="fas fa-clipboard-check"></i>
+                            </div>
+                            <h3>Checklist Wajib Peserta SAS</h3>
+                        </div>
+                        <p class="text-xs text-slate-500 mb-4">Centang perlengkapan di bawah ini sebelum berangkat ke sekolah:</p>
+                        <ul class="space-y-3 text-sm text-slate-700">
+                            <li class="flex items-start gap-2.5 p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                                <input type="checkbox" class="mt-1 rounded text-sanclar-blue focus:ring-sanclar-blue w-4 h-4">
+                                <span><strong>Laptop siap pakai</strong> (bagi yang mengerjakan di Lab tidak perlu membawa laptop).</span>
+                            </li>
+                            <li class="flex items-start gap-2.5 p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                                <input type="checkbox" class="mt-1 rounded text-sanclar-blue focus:ring-sanclar-blue w-4 h-4">
+                                <span><strong>Exam Browser</strong> sudah terpasang dan berjalan lancar di laptop.</span>
+                            </li>
+                            <li class="flex items-start gap-2.5 p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                                <input type="checkbox" class="mt-1 rounded text-sanclar-blue focus:ring-sanclar-blue w-4 h-4">
+                                <span><strong>Akun belajar.id & password</strong> ditulis di kertas kecil dan ditempel di laptop.</span>
+                            </li>
+                            <li class="flex items-start gap-2.5 p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                                <input type="checkbox" class="mt-1 rounded text-sanclar-blue focus:ring-sanclar-blue w-4 h-4">
+                                <span>Membawa <strong>kabel olor + charger laptop</strong>.</span>
+                            </li>
+                            <li class="flex items-start gap-2.5 p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                                <input type="checkbox" class="mt-1 rounded text-sanclar-blue focus:ring-sanclar-blue w-4 h-4">
+                                <span>Datang <strong>tidak terlambat</strong> & dijemput tepat waktu.</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-slate-100 text-xs text-slate-400 flex justify-between items-center">
+                        <span>Surabaya, 6 Nov 2026</span>
+                        <span class="font-semibold text-slate-600">Koord: Vinsentia Asri</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB 2: RINGKASAN MATERI & TRIK HAFAL ==================== -->
+        <section id="tab-belajar" class="tab-content hidden space-y-6">
+            <!-- Subject Selector Pills -->
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
+                <div class="flex items-center justify-between mb-3">
+                    <h2 class="text-sm font-bold uppercase tracking-wider text-slate-500">Pilih Mata Pelajaran:</h2>
+                    <span class="text-xs text-sanclar-blue font-semibold">8 Mapel Lengkap</span>
+                </div>
+                <div id="studySubjectPills" class="flex flex-wrap gap-2">
+                    <!-- Injected via JS -->
+                </div>
+            </div>
+
+            <!-- Study Content Display -->
+            <div id="studyContentContainer" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Left/Main: Ringkasan Materi -->
+                <div class="lg:col-span-7 bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8 space-y-6">
+                    <div class="border-b border-slate-100 pb-4 flex flex-wrap items-center justify-between gap-2">
+                        <div>
+                            <span id="studyBadge" class="text-xs font-bold px-2.5 py-1 rounded-md bg-blue-100 text-sanclar-blue">Mata Pelajaran</span>
+                            <h3 id="studyTitle" class="text-xl sm:text-2xl font-extrabold text-slate-800 mt-1.5">Judul Materi</h3>
+                        </div>
+                        <button onclick="jumpToQuizFromStudy()" class="px-4 py-2 rounded-xl bg-sanclar-blue text-white text-xs font-bold hover:bg-sanclar-lightBlue transition flex items-center gap-1.5 shadow">
+                            <i class="fas fa-play"></i> Latihan Kuis Mapel Ini
+                        </button>
+                    </div>
+                    <div id="studySummaryBody" class="space-y-5 text-slate-700 text-sm sm:text-base leading-relaxed">
+                        <!-- Summary cards injected via JS -->
+                    </div>
+                </div>
+
+                <!-- Right: Trik Khusus & Jembatan Keledai -->
+                <div class="lg:col-span-5 space-y-6">
+                    <div class="bg-gradient-to-br from-amber-50 via-yellow-50 to-orange-50 rounded-2xl shadow-sm border-2 border-amber-300/80 p-6 sm:p-7 relative overflow-hidden">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-11 h-11 rounded-2xl bg-amber-400 text-amber-950 flex items-center justify-center text-xl shadow-sm shrink-0">
+                                <i class="fas fa-lightbulb"></i>
+                            </div>
+                            <div>
+                                <span class="text-[11px] font-extrabold uppercase tracking-wider text-amber-700">Cheat Sheet & Hafalan Kilat</span>
+                                <h4 class="text-lg font-extrabold text-amber-950">Trik Khusus & Jembatan Keledai</h4>
+                            </div>
+                        </div>
+                        <div id="studyTricksBody" class="space-y-4 text-sm text-amber-950">
+                            <!-- Tricks injected via JS -->
+                        </div>
+                    </div>
+
+                    <!-- Mini Quick Tip Box -->
+                    <div class="bg-sanclar-blue text-white rounded-2xl p-5 shadow-md">
+                        <div class="flex items-center gap-2 text-sanclar-gold font-bold text-sm mb-2">
+                            <i class="fas fa-star"></i>
+                            <span>Tips Mengerjakan Soal SAS</span>
+                        </div>
+                        <p class="text-xs sm:text-sm text-blue-100 leading-relaxed">
+                            Baca soal dengan teliti, tandai kata kunci seperti <em>"kecuali"</em>, <em>"yang bukan"</em>, atau satuan ukuran (cm/m) pada Matematika. Jangan terburu-buru menekan tombol selesai!
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB 3: KUIS SINGKAT (PILIHAN GANDA) ==================== -->
+        <section id="tab-kuis" class="tab-content hidden space-y-6">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-lg font-extrabold text-slate-800">Kuis Singkat (Pilihan Ganda)</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">Pilih mata pelajaran untuk berlatih soal pilihan ganda dengan pembahasan langsung.</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <select id="quizSubjectSelect" onchange="initQuickQuiz()" class="px-4 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold text-slate-700 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-sanclar-blue">
+                        <!-- Options injected via JS -->
+                    </select>
+                    <button onclick="initQuickQuiz()" class="px-4 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 text-sm font-semibold transition" title="Ulangi Kuis">
+                        <i class="fas fa-redo"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quiz Container -->
+            <div id="quickQuizContainer" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8 max-w-4xl mx-auto">
+                <!-- Dynamic Quiz Content -->
+            </div>
+        </section>
+
+        <!-- ==================== TAB 4: SIMULASI EXAM BROWSER SAS (AI GRADING) ==================== -->
+        <section id="tab-ujian" class="tab-content hidden">
+            <!-- Exam Lobby (Before starting test) -->
+            <div id="examLobby" class="max-w-4xl mx-auto bg-white rounded-3xl shadow-lg border border-slate-200 overflow-hidden">
+                <div class="bg-sanclar-blue p-6 sm:p-8 text-white">
+                    <div class="flex items-center gap-2 text-sanclar-gold text-xs font-bold uppercase tracking-wider mb-2">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Mode Exam Browser • Simulasi CBT</span>
+                    </div>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold">Simulasi Ujian Akhir Semester (SAS 1)</h2>
+                    <p class="text-blue-100 text-sm mt-2">Uji kesiapanmu dengan suasana ujian CBT sungguhan. Jawaban Isian Singkat & Uraian akan dikoreksi dan di-review langsung oleh AI!</p>
+                </div>
+
+                <div class="p-6 sm:p-8 space-y-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-500 mb-1.5">Nama Lengkap Siswa</label>
+                            <input type="text" id="studentNameInput" placeholder="Contoh: Felicia Putri" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-sanclar-blue focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-500 mb-1.5">Pilih Paket Simulasi Ujian</label>
+                            <select id="examPackageSelect" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold text-slate-700 bg-slate-50 focus:ring-2 focus:ring-sanclar-blue focus:outline-none">
+                                <option value="ALL">Paket Lengkap Gabungan Semua Mapel (16 Soal - 45 Menit)</option>
+                                <option value="jawa">Paket Mapel: Bahasa Jawa (8 Soal - 25 Menit)</option>
+                                <option value="ipas">Paket Mapel: IPAS (8 Soal - 25 Menit)</option>
+                                <option value="agama">Paket Mapel: Pendidikan Agama Katolik (8 Soal - 25 Menit)</option>
+                                <option value="bindo">Paket Mapel: Bahasa Indonesia (8 Soal - 25 Menit)</option>
+                                <option value="pancasila">Paket Mapel: Pendidikan Pancasila (8 Soal - 25 Menit)</option>
+                                <option value="binggris">Paket Mapel: Bahasa Inggris (8 Soal - 25 Menit)</option>
+                                <option value="matematika">Paket Mapel: Matematika (8 Soal - 30 Menit)</option>
+                                <option value="mandarin">Paket Mapel: Bahasa Mandarin (8 Soal - 25 Menit)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Exam Structure Info -->
+                    <div class="bg-slate-50 rounded-2xl p-5 border border-slate-200">
+                        <h4 class="text-sm font-bold text-slate-800 mb-3 flex items-center gap-2">
+                            <i class="fas fa-list-ol text-sanclar-blue"></i> Struktur Tipe Soal dalam Simulasi Ini:
+                        </h4>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+                            <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-xs">
+                                <span class="block text-xs font-bold text-blue-600">Bagian A</span>
+                                <span class="text-sm font-extrabold text-slate-800">Pilihan Ganda</span>
+                            </div>
+                            <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-xs">
+                                <span class="block text-xs font-bold text-emerald-600">Bagian B</span>
+                                <span class="text-sm font-extrabold text-slate-800">Benar / Salah</span>
+                            </div>
+                            <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-xs">
+                                <span class="block text-xs font-bold text-amber-600">Bagian C</span>
+                                <span class="text-sm font-extrabold text-slate-800">Isian Singkat</span>
+                            </div>
+                            <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-xs">
+                                <span class="block text-xs font-bold text-purple-600">Bagian D</span>
+                                <span class="text-sm font-extrabold text-slate-800">Uraian</span>
+                            </div>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-3 leading-relaxed">
+                            <i class="fas fa-robot text-sanclar-blue mr-1"></i> <strong>Aturan Ujian:</strong> Selama ujian berlangsung, kunci jawaban dikunci. Setelah kamu menekan tombol <strong>"Akhiri Test"</strong>, sistem dan AI akan memeriksa semua jawabanmu, menghitung nilai akhir, dan memberikan pembahasan khusus untuk setiap nomor yang salah!
+                        </p>
+                    </div>
+
+                    <div class="flex justify-end">
+                        <button onclick="startExamSimulation()" class="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-sanclar-blue hover:bg-sanclar-lightBlue text-white font-bold text-sm sm:text-base shadow-lg transition flex items-center justify-center gap-2">
+                            <i class="fas fa-play-circle"></i> Mulai Ujian Sekarang
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Exam Browser Interface -->
+            <div id="examActiveInterface" class="hidden exam-browser-frame bg-white rounded-2xl overflow-hidden">
+                <!-- Exam Browser Top Bar -->
+                <div class="bg-sanclar-blue text-white px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3 border-b-4 border-sanclar-gold">
+                    <div class="flex items-center gap-3">
+                        <span class="px-2.5 py-1 rounded bg-red-600 text-white text-[11px] font-extrabold uppercase tracking-wider animate-pulse flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-white"></span> EXAM BROWSER AKTIF
+                        </span>
+                        <div class="text-xs sm:text-sm">
+                            <span class="text-blue-200">Peserta:</span> <strong id="examDisplayStudentName">Siswa Kelas VI</strong>
+                            <span class="mx-2 text-blue-400">|</span>
+                            <span id="examDisplayPackage" class="text-sanclar-gold font-semibold">Paket Lengkap</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="bg-slate-900/60 px-3.5 py-1.5 rounded-xl border border-white/15 flex items-center gap-2">
+                            <i class="fas fa-clock text-sanclar-gold"></i>
+                            <span id="examTimerDisplay" class="font-mono font-extrabold text-base sm:text-lg tracking-wider text-white">45:00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exam Workspace Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 min-h-[520px]">
+                    <!-- Question Area (Left 8 cols) -->
+                    <div class="lg:col-span-8 p-5 sm:p-8 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-slate-200">
+                        <div>
+                            <!-- Question Header Meta -->
+                            <div class="flex flex-wrap items-center justify-between gap-2 pb-4 mb-5 border-b border-slate-100">
+                                <div class="flex items-center gap-2">
+                                    <span class="px-3 py-1 rounded-lg bg-sanclar-blue text-white font-extrabold text-sm">
+                                        Soal No. <span id="currentQNumber">1</span>
+                                    </span>
+                                    <span id="currentQTypeBadge" class="px-2.5 py-1 rounded-lg bg-blue-50 text-sanclar-blue border border-blue-200 text-xs font-bold">
+                                        Pilihan Ganda
+                                    </span>
+                                    <span id="currentQSubjectBadge" class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 text-xs font-semibold">
+                                        Mapel
+                                    </span>
+                                </div>
+                                <label class="inline-flex items-center gap-2 cursor-pointer select-none px-3 py-1.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold">
+                                    <input type="checkbox" id="raguCheckbox" onchange="toggleRagu()" class="rounded text-amber-500 focus:ring-amber-500">
+                                    <span>Ragu-ragu</span>
+                                </label>
+                            </div>
+
+                            <!-- Question Prompt -->
+                            <div id="examQuestionBody" class="space-y-5">
+                                <!-- Injected via JS -->
+                            </div>
+                        </div>
+
+                        <!-- Bottom Question Navigation -->
+                        <div class="pt-6 mt-8 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
+                            <button id="prevQBtn" onclick="navigateExamQuestion(-1)" class="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs sm:text-sm transition flex items-center gap-2 disabled:opacity-40">
+                                <i class="fas fa-arrow-left"></i> Sebelumnya
+                            </button>
+
+                            <button id="nextQBtn" onclick="navigateExamQuestion(1)" class="px-5 py-2.5 rounded-xl bg-sanclar-blue hover:bg-sanclar-lightBlue text-white font-bold text-xs sm:text-sm transition flex items-center gap-2">
+                                <span>Selanjutnya</span> <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Navigation Matrix & Submit Panel (Right 4 cols) -->
+                    <div class="lg:col-span-4 bg-slate-50 p-5 sm:p-6 flex flex-col justify-between">
+                        <div>
+                            <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-500 mb-3">Navigasi Nomor Soal</h4>
+                            <div id="examNavGrid" class="grid grid-cols-5 sm:grid-cols-6 lg:grid-cols-5 gap-2 mb-6">
+                                <!-- Number buttons injected via JS -->
+                            </div>
+
+                            <!-- Legend -->
+                            <div class="space-y-2 text-xs text-slate-600 bg-white p-3.5 rounded-xl border border-slate-200">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-4 h-4 rounded bg-emerald-500 inline-block"></span>
+                                    <span>Sudah Dijawab</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="w-4 h-4 rounded bg-amber-400 inline-block"></span>
+                                    <span>Ragu-ragu</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="w-4 h-4 rounded bg-white border-2 border-sanclar-blue inline-block"></span>
+                                    <span>Sedang Dibuka</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="w-4 h-4 rounded bg-slate-200 inline-block"></span>
+                                    <span>Belum Dijawab</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 pt-4 border-t border-slate-200">
+                            <div class="flex justify-between text-xs font-semibold text-slate-600 mb-2">
+                                <span>Terjawab:</span>
+                                <span id="answeredCountText">0 / 0 Soal</span>
+                            </div>
+                            <button onclick="confirmFinishExam()" class="w-full py-3.5 px-4 rounded-xl bg-red-600 hover:bg-red-700 text-white font-extrabold text-sm shadow-lg transition flex items-center justify-center gap-2">
+                                <i class="fas fa-check-double"></i> Akhiri Test & Periksa Nilai
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Grading Loading Screen -->
+            <div id="examGradingLoader" class="hidden max-w-2xl mx-auto bg-white rounded-3xl shadow-xl border border-slate-200 p-8 sm:p-12 text-center space-y-5">
+                <div class="w-16 h-16 rounded-2xl bg-blue-50 text-sanclar-blue flex items-center justify-center text-3xl mx-auto animate-bounce">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3 class="text-xl sm:text-2xl font-extrabold text-slate-800">AI Sedang Mengoreksi Jawabanmu...</h3>
+                <p class="text-sm text-slate-600 max-w-md mx-auto leading-relaxed">
+                    Mohon tunggu sebentar! Guru AI sedang memeriksa jawaban Pilihan Ganda, Benar/Salah, Isian Singkat, dan Uraianmu serta menyiapkan ulasan untuk soal yang salah.
+                </p>
+                <div class="w-full max-w-xs mx-auto bg-slate-100 rounded-full h-2.5 overflow-hidden">
+                    <div class="bg-sanclar-blue h-2.5 rounded-full animate-pulse w-3/4"></div>
+                </div>
+            </div>
+
+            <!-- Exam Results & AI Review Screen -->
+            <div id="examResultScreen" class="hidden space-y-6 max-w-5xl mx-auto">
+                <!-- Score Summary Card -->
+                <div class="bg-gradient-to-r from-sanclar-blue to-sanclar-lightBlue rounded-3xl p-6 sm:p-8 text-white shadow-xl">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                        <div>
+                            <span class="px-3 py-1 rounded-full bg-sanclar-gold text-sanclar-blue text-xs font-extrabold uppercase tracking-wider">
+                                Hasil Evaluasi SAS 1
+                            </span>
+                            <h2 id="resultStudentTitle" class="text-2xl sm:text-3xl font-extrabold mt-2">Selamat, Siswa!</h2>
+                            <p id="resultFeedbackSummary" class="text-blue-100 text-sm mt-1 max-w-xl">
+                                Berikut adalah hasil koreksi lengkap ujian simulasi SAS 1 kamu.
+                            </p>
+                        </div>
+                        <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-5 text-center min-w-[170px]">
+                            <span class="block text-xs uppercase tracking-wider text-blue-200 font-bold">Nilai Akhir</span>
+                            <span id="finalScoreValue" class="text-4xl sm:text-5xl font-black text-sanclar-gold my-1 block">0</span>
+                            <span id="finalScorePredicate" class="text-xs font-semibold px-2.5 py-0.5 rounded bg-white/20 text-white">Predikat</span>
+                        </div>
+                    </div>
+
+                    <!-- Breakdown stats -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6 pt-6 border-t border-white/15 text-center">
+                        <div class="bg-slate-900/25 rounded-xl p-3">
+                            <span class="block text-xs text-blue-200">Pilihan Ganda</span>
+                            <strong id="statPG" class="text-base sm:text-lg font-extrabold">0/0</strong>
+                        </div>
+                        <div class="bg-slate-900/25 rounded-xl p-3">
+                            <span class="block text-xs text-blue-200">Benar / Salah</span>
+                            <strong id="statBS" class="text-base sm:text-lg font-extrabold">0/0</strong>
+                        </div>
+                        <div class="bg-slate-900/25 rounded-xl p-3">
+                            <span class="block text-xs text-blue-200">Isian Singkat (AI)</span>
+                            <strong id="statIsian" class="text-base sm:text-lg font-extrabold">0/0</strong>
+                        </div>
+                        <div class="bg-slate-900/25 rounded-xl p-3">
+                            <span class="block text-xs text-blue-200">Uraian (AI)</span>
+                            <strong id="statUraian" class="text-base sm:text-lg font-extrabold">0/0</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Review Section (Focus on Wrong/Partial Answers + Full Details) -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8 space-y-6">
+                    <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
+                        <div>
+                            <h3 class="text-lg sm:text-xl font-extrabold text-slate-800 flex items-center gap-2">
+                                <i class="fas fa-chalkboard-teacher text-sanclar-blue"></i>
+                                <span>Review & Pembahasan Detail oleh AI</span>
+                            </h3>
+                            <p class="text-xs sm:text-sm text-slate-500">Pelajari bagian yang masih kurang tepat agar saat ujian SAS sungguhan mendapat nilai 100!</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="filterReview('wrong')" id="btnFilterWrong" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-red-100 text-red-700 border border-red-200">
+                                Fokus Jawaban Salah / Kurang Tepat
+                            </button>
+                            <button onclick="filterReview('all')" id="btnFilterAll" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-600">
+                                Tampilkan Semua Soal
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="reviewListContainer" class="space-y-4">
+                        <!-- Review cards injected via JS -->
+                    </div>
+
+                    <div class="pt-4 border-t border-slate-100 flex justify-between items-center">
+                        <button onclick="resetExamToLobby()" class="px-5 py-2.5 rounded-xl bg-sanclar-blue hover:bg-sanclar-lightBlue text-white font-bold text-sm transition flex items-center gap-2">
+                            <i class="fas fa-redo"></i> Coba Simulasi Paket Lain
+                        </button>
+                        <button onclick="switchMainTab('belajar')" class="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm transition">
+                            Kembali ke Materi Belajar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-4 mt-10 text-center text-xs text-slate-500">
+        <p>Portal Belajar & Simulasi SAS 1 • Kelas VI SD Katolik Santa Clara Surabaya (TA 2026/2027)</p>
+    </footer>
+
+    <script>
+        // ==================== DATA MATERI & TRIK HAFAL (8 MAPEL) ====================
+        const SUBJECTS_DATA = {
+            jawa: {
+                id: 'jawa',
+                name: 'Bahasa Jawa',
+                schedule: 'Senin, 23 Nov 2026 (07.00 - 08.30)',
+                topic: 'Aksara Jawa dan Geguritan',
+                color: 'bg-amber-600',
+                summary: [
+                    {
+                        title: '1. Aksara Jawa (Carakan / Nglegena)',
+                        points: [
+                            'Aksara Jawa dasar berjumlah <strong>20 huruf</strong> yang semuanya berbunyi vokal /a/ (nglegena): <br><span class="font-jawa text-lg text-sanclar-blue font-bold">ꦲ (ha) ꦤ (na) ꦕ (ca) ꦫ (ra) ꦏ (ka) | ꦢ (da) ꦠ (ta) ꦱ (sa) ꦮ (wa) ꦭ (la) | ꦥ (pa) ꦝ (dha) ꦗ (ja) ꦪ (ya) ꦚ (nya) | ꦩ (ma) ꦒ (ga) ꦧ (ba) ꦛ (tha) ꦔ (nga)</span>.',
+                            '<strong>Sandhangan Swara</strong> (pengubah bunyi vokal):<br>• <em>Wulu</em> ( ꦶ ) = bunyi <strong>i</strong> (di atas huruf)<br>• <em>Suku</em> ( ꦸ ) = bunyi <strong>u</strong> (di bawah huruf)<br>• <em>Taling</em> ( ꦺ ) = bunyi <strong>é</strong> (di depan huruf)<br>• <em>Pepet</em> ( ꦼ ) = bunyi <strong>ê</strong> seperti kata "emas" (di atas huruf)<br>• <em>Taling Tarung</em> ( ꦺꦴ ) = bunyi <strong>o</strong> (mengapit huruf).',
+                            '<strong>Sandhangan Panyigeg Wanda</strong> (penutup suku kata):<br>• <em>Wignyan</em> ( ꦃ ) = mati <strong>h</strong><br>• <em>Layar</em> (  layar / ꦂ ) = mati <strong>r</strong><br>• <em>Cecak</em> ( ꦁ ) = mati <strong>ng</strong><br>• <em>Pangkon</em> ( ꧀ ) = mematikan huruf vokal di akhir kalimat.'
+                        ]
+                    },
+                    {
+                        title: '2. Geguritan (Puisi Bahasa Jawa)',
+                        points: [
+                            '<strong>Geguritan</strong> yaiku puisi basa Jawa gagrag anyar (modern) sing ora kaiket dening aturan guru gatra, guru wilangan, lan guru lagu.',
+                            '<strong>Ciri-ciri Geguritan:</strong> Migunakake basa sing endah (pilihan tembung / diksi mentes), isine padhet, lan nduweni amanat/piwulang becik.',
+                            '<strong>Bab sing kudu digatekake nalika maca geguritan (4W):</strong><br>• <em>Wirama</em>: cendhek-dhuwure swara, intonasi, lan jeda.<br>• <em>Wirasa</em>: penghayatan utawa ngrasakake isine geguritan (sedhih, seneng, semangat).<br>• <em>Wiraga</em>: obahing awak (gestur) sing luwes lan ora kaku.<br>• <em>Wicara</em>: cethane pangucapan aksara/tembung (artikulasi).'
+                        ]
+                    }
+                ],
+                tricks: [
+                    {
+                        title: 'Trik Membedakan Aksara Jawa yang Mirip!',
+                        content: '• <strong>Ha (ꦲ) vs La (ꦭ):</strong> Ha kakinya 3 (depan 1, belakang 2). La kakinya 3 (depan 2, belakang 1) — kebalikannya!<br>• <strong>Pa (ꦥ) vs Ya (ꦪ):</strong> Pa lengkungannya cuma 2 gunung. Ya lengkungannya 3 gunung.<br>• <strong>Ma (ꦩ) vs Ja (ꦗ):</strong> Ma seperti huruf "E" di depan lalu ada buntut, sedangkan Ja depannya seperti huruf "R" besar.<br>• <strong>Sa (ꦱ) vs Da (ꦢ):</strong> Sa lengkung pertama di atas, Da lengkung pertama tajam di bawah.'
+                    },
+                    {
+                        title: 'Jembatan Keledai Sandhangan Swara: "Wu-Su-Ta-Pe-TaTa"',
+                        content: '• <strong>Wu</strong>lu = <strong>i</strong> (atas) -> ingat "Wul<strong>i</strong>"<br>• <strong>Su</strong>ku = <strong>u</strong> (bawah) -> ingat "Suk<strong>u</strong>"<br>• <strong>Ta</strong>ling = <strong>é</strong> (depan) -> ingat "T<strong>é</strong>linga"<br>• <strong>Pe</strong>pet = <strong>ê</strong> (atas) -> ingat "P<strong>ê</strong>p<strong>ê</strong>t"<br>• <strong>Ta</strong>ling <strong>Ta</strong>rung = <strong>o</strong> (apit) -> ingat "T<strong>o</strong>t<strong>o</strong>"'
+                    },
+                    {
+                        title: 'Hafal Cepat Syarat Baca Geguritan: "4W"',
+                        content: '<strong>Wi-Ra-Ga-Ca</strong>: <strong>Wi</strong>rama (nada), Wi<strong>ra</strong>sa (rasa/ekspresi), Wira<strong>ga</strong> (gerak tubuh), Wi<strong>ca</strong>ra (cara ucap/artikulasi).'
+                    }
+                ]
+            },
+            ipas: {
+                id: 'ipas',
+                name: 'IPAS',
+                schedule: 'Senin, 23 Nov 2026 (09.00 - 11.00)',
+                topic: 'Bab 4: Kearifan Lokal, Warisan Leluhur untuk Persatuan Bangsa',
+                color: 'bg-emerald-600',
+                summary: [
+                    {
+                        title: '1. Pengertian & Ciri Kearifan Lokal',
+                        points: [
+                            '<strong>Kearifan lokal</strong> adalah pandangan hidup, ilmu pengetahuan, serta strategi kehidupan berwujud aktivitas yang dilakukan oleh masyarakat lokal dalam menjawab berbagai masalah dan menjaga kelestarian alam.',
+                            '<strong>Ciri-ciri:</strong> Mampu bertahan terhadap budaya luar, memiliki kemampuan mengakomodasi unsur budaya luar, mampu mengintegrasikan budaya luar ke budaya asli, serta memberi arah pada perkembangan budaya.'
+                        ]
+                    },
+                    {
+                        title: '2. Contoh Kearifan Lokal Nusantara',
+                        points: [
+                            '<strong>Subak (Bali):</strong> Sistem pengairan sawah tradisional yang adil dan demokratis berlandaskan filosofi <em>Tri Hita Karana</em> (hubungan harmonis manusia dengan Tuhan, sesama, dan alam).',
+                            '<strong>Sasi (Maluku & Papua):</strong> Larangan adat untuk mengambil hasil sumber daya alam tertentu (laut atau hutan) dalam jangka waktu tertentu agar alam pulih dan lestari.',
+                            '<strong>Hutan Larangan Adat (Riau / Jambi / Baduy):</strong> Aturan adat yang melarang warga menebang pohon sembarangan di hutan tertentu untuk mencegah banjir dan kekeringan.',
+                            '<strong>Fahombo / Lompat Batu (Nias, Sumatera Utara):</strong> Tradisi ketangkasan pemuda melompati susunan batu setinggi ±2 meter sebagai tanda kedewasaan dan keberanian.',
+                            '<strong>Gugur Gunung / Sambatan (Jawa):</strong> Tradisi gotong royong membangun rumah atau fasilitas umum bersama-sama tanpa pamrih.'
+                        ]
+                    },
+                    {
+                        title: '3. Manfaat & Peran bagi Persatuan Bangsa',
+                        points: [
+                            'Menjaga kelestarian lingkungan dan keseimbangan ekosistem.',
+                            'Mempererat tali persaudaraan, toleransi, dan gotong royong antarwarga (menguatkan Bhinneka Tunggal Ika).',
+                            'Menjadi identitas budaya bangsa yang membanggakan di mata dunia.'
+                        ]
+                    }
+                ],
+                tricks: [
+                    {
+                        title: 'Jembatan Keledai Pasangan Kearifan Lokal & Daerahnya',
+                        content: '• <strong>SU-BA</strong> = <strong>Su</strong>bak dari <strong>Ba</strong>li (ingat: Subak = Sawah & Air).<br>• <strong>SA-MA</strong> = <strong>Sa</strong>si dari <strong>Ma</strong>luku (ingat: Sasi = Stop Ambil Sumberdaya sementara).<br>• <strong>FA-NI</strong> = <strong>Fa</strong>hombo (Lompat Batu) dari <strong>Ni</strong>as.<br>• <strong>TRI HI-KA</strong> = <strong>Tri Hi</strong>ta <strong>Ka</strong>rana (3 Harmoni: Tuhan, Manusia, Alam).'
+                    },
+                    {
+                        title: 'Kata Kunci Soal HOTS IPAS Bab 4',
+                        content: 'Jika soal bercerita tentang <em>"mencegah penangkapan ikan berlebihan / menjaga terumbu karang"</em> -> jawabannya <strong>Sasi</strong>.<br>Jika soal bercerita tentang <em>"pembagian air irigasi sawah secara adil"</em> -> jawabannya <strong>Subak</strong>.'
+                    }
+                ]
+            },
+            agama: {
+                id: 'agama',
+                name: 'Pendidikan Agama Katolik',
+                schedule: 'Selasa, 24 Nov 2026 (07.00 - 08.30)',
+                topic: 'Bab II (B, C, dan D): Keberagaman, Toleransi & Persatuan',
+                color: 'bg-purple-600',
+                summary: [
+                    {
+                        title: '1. Bagian B: Keberagaman sebagai Anugerah Tuhan',
+                        points: [
+                            'Indonesia memiliki beragam suku, budaya, bahasa, dan agama. Dalam iman Katolik, keberagaman adalah <strong>anugerah dan kekayaan dari Tuhan</strong> yang harus disyukuri, bukan sumber perpecahan.',
+                            'Dalam Kitab Suci (1 Korintus 12:12-27), Santo Paulus mengajarkan perumpamaan <strong>"Banyak Anggota, Tetapi Satu Tubuh"</strong>. Setiap anggota memiliki peran berbeda namun saling membutuhkan.'
+                        ]
+                    },
+                    {
+                        title: '2. Bagian C: Toleransi dan Kerja Sama Antarumat Beragama',
+                        points: [
+                            'Gereja Katolik melalui dokumen Konsili Vatikan II (<em>Nostra Aetate</em>) mengajarkan untuk menghormati segala sesuatu yang benar dan suci dalam agama-agama lain.',
+                            '<strong>Wujud nyata toleransi:</strong> Tidak mengganggu ibadah teman yang berbeda agama, mengucapkan selamat hari raya, bekerja bakti membersihkan lingkungan bersama, dan menolong korban bencana tanpa memandang agama.'
+                        ]
+                    },
+                    {
+                        title: '3. Bagian D: Mewujudkan Persatuan dan Keadilan (Ajaran Yesus)',
+                        points: [
+                            'Yesus sendiri memberi teladan melampaui sekat perbedaan, misalnya saat Ia berbicara dengan <strong>Perempuan Samaria di sumur Yakub</strong> (Yohanes 4:1-42) dan perumpamaan <strong>Orang Samaria yang Murah Hati</strong> (Lukas 10:25-37).',
+                            'Hukum Cinta Kasih (Matius 22:37-39): Mengasihi Tuhan Allah dengan segenap hati, dan mengasihi sesama manusia seperti diri sendiri (termasuk yang berbeda dengan kita).'
+                        ]
+                    }
+                ],
+                tricks: [
+                    {
+                        title: 'Hafal Kilat Ayat & Dokumen Gereja Bab II',
+                        content: '• <strong>1 Korintus 12</strong> = "Banyak anggota, <strong>1</strong> Tubuh Kristus" (ingat angka 1 di depan!).<br>• <strong>Nostra Aetate</strong> = Dokumen Gereja tentang <strong>hubungan baik dengan agama lain</strong> (ingat: <em>Aetate = Agama</em>).<br>• <strong>Orang Samaria yang Murah Hati</strong> = Cinta kasih <strong>tanpa memandang suku/agama</strong>.'
+                    },
+                    {
+                        title: 'Batas Toleransi dalam Iman Katolik',
+                        content: 'Ingat! Toleransi berarti <strong>menghormati dan bekerja sama dalam kehidupan sosial/kemasyarakatan</strong>, tetapi tetap teguh menjaga iman Katolik (tidak mencampuradukkan tata cara ibadah/ritual agama).'
+                    }
+                ]
+            },
+            bindo: {
+                id: 'bindo',
+                name: 'Bahasa Indonesia',
+                schedule: 'Selasa, 24 Nov 2026 (09.00 - 11.00)',
+                topic: 'Bab 4: Formulir, Jenis-Jenis Teks, dan Kalimat Majemuk',
+                color: 'bg-rose-600',
+                summary: [
+                    {
+                        title: '1. Teks Formulir',
+                        points: [
+                            '<strong>Formulir</strong> adalah lembar isian formal yang berisi data diri atau informasi tertentu untuk tujuan administrasi (pendaftaran lomba, anggota perpustakaan, pengiriman barang/wesel pos).',
+                            '<strong>Bagian-bagian Formulir:</strong> (1) Kepala/Judul formulir, (2) Petunjuk pengisian, (3) Bagian isi/identitas diri, (4) Penutup (tempat, tanggal, tanda tangan, dan nama terang).',
+                            '<strong>Aturan mengisi:</strong> Gunakan pulpen tinta hitam/biru, tulis dengan huruf kapital/balok agar jelas terbaca, isi sesuai fakta, dan hindari coretan.'
+                        ]
+                    },
+                    {
+                        title: '2. Jenis-Jenis Teks',
+                        points: [
+                            '<strong>Teks Narasi:</strong> Teks yang menceritakan rangkaian peristiwa/kejadian secara kronologis (urutan waktu), ada tokoh dan alur (contoh: cerpen, dongeng).',
+                            '<strong>Teks Deskripsi:</strong> Teks yang menggambarkan suatu objek, tempat, atau suasana secara rinci sehingga pembaca seolah-olah melihat, mendengar, atau merasakannya sendiri.',
+                            '<strong>Teks Eksposisi:</strong> Teks yang memaparkan informasi, pengetahuan, atau fakta secara objektif untuk menambah wawasan pembaca.',
+                            '<strong>Teks Argumentasi:</strong> Teks yang berisi pendapat penulis yang disertai alasan kuat, data, dan bukti untuk meyakinkan pembaca.',
+                            '<strong>Teks Persuasi:</strong> Teks yang bertujuan mengajak, membujuk, atau memengaruhi pembaca agar melakukan sesuatu (biasanya ada kata <em>ayo, mari, hendaknya</em>).'
+                        ]
+                    },
+                    {
+                        title: '3. Kalimat Majemuk',
+                        points: [
+                            '<strong>Kalimat Majemuk Setara:</strong> Gabungan dua klausa yang kedudukannya sejajar. Konjungsi: <em>dan, serta, atau, tetapi, sedangkan, melainkan, lalu</em>.',
+                            '<strong>Kalimat Majemuk Bertingkat:</strong> Gabungan induk kalimat dan anak kalimat (tidak sejajar). Konjungsi: <em>ketika, sejak, karena, sebab, sehingga, agar, supaya, meskipun, jika</em>.',
+                            '<strong>Kalimat Majemuk Campuran:</strong> Gabungan kalimat majemuk setara dan bertingkat (minimal terdiri dari 3 klausa).'
+                        ]
+                    }
+                ],
+                tricks: [
+                    {
+                        title: 'Jembatan Keledai 5 Jenis Teks: "NA-DE-EK-AR-PER"',
+                        content: '• <strong>NA</strong>rasi = Cerita berurutan (ada alur & tokoh).<br>• <strong>DE</strong>skripsi = Gambaran pancaindra (seolah melihat/merasakan).<br>• <strong>EK</strong>sposisi = Info & Fakta (menambah ilmu).<br>• <strong>AR</strong>gumentasi = Pendapat + Bukti/Alasan kuat.<br>• <strong>PER</strong>suasi = Ajakan/Bujukan (ada kata <em>Ayo/Mari</em>).'
+                    },
+                    {
+                        title: 'Trik Anti Tertukar Kalimat Majemuk Setara vs Bertingkat',
+                        content: 'Hafalkan kata hubung <strong>SETARA</strong> saja dengan singkatan <strong>"DA-TA-TE-SE-LA"</strong>:<br><strong>Da</strong>n, a<strong>ta</strong>u, <strong>te</strong>tapi, <strong>se</strong>dangkan, <strong>la</strong>lu (serta <em>melainkan</em>).<br>👉 Jika konjungsinya <strong>BUKAN</strong> dari kelompok DA-TA-TE-SE-LA (misal: <em>karena, ketika, agar, jika, meskipun</em>), pasti itu <strong>Kalimat Majemuk Bertingkat</strong>!'
+                    }
+                ]
+            },
+            pancasila: {
+                id: 'pancasila',
+                name: 'Pendidikan Pancasila',
+                schedule: 'Rabu, 25 Nov 2026 (07.00 - 08.30)',
+                topic: 'Hak dan Kewajiban serta Musyawarah',
+                color: 'bg-red-600',
+                summary: [
+                    {
+                        title: '1. Hak dan Kewajiban Warga Negara & Anak',
+                        points: [
+                            '<strong>Hak</strong> adalah segala sesuatu yang mutlak menjadi milik kita dan penggunaannya tergantung kepada kita sendiri (contoh: mendapat kasih sayang orang tua, mendapat pelajaran di sekolah, menikmati lingkungan bersih).',
+                            '<strong>Kewajiban</strong> adalah segala sesuatu yang harus dilaksanakan dengan penuh rasa tanggung jawab (contoh: membantu orang tua, menaati tata tertib sekolah, membayar pajak, menjaga kebersihan).',
+                            '<strong>Prinsip Utama:</strong> Pelaksanaan hak dan kewajiban harus <strong>seimbang</strong>. Kita harus mendahulukan kewajiban sebelum menuntut hak.'
+                        ]
+                    },
+                    {
+                        title: '2. Musyawarah untuk Mufakat',
+                        points: [
+                            '<strong>Musyawarah</strong> adalah pembahasan bersama untuk mencapai keputusan atas penyelesaian masalah bersama. Sesuai dengan <strong>Sila ke-4 Pancasila</strong> ("Kerakyatan yang dipimpin oleh hikmat kebijaksanaan dalam permusyawaratan/perwakilan") dengan lambang <strong>Kepala Banteng</strong>.',
+                            '<strong>Asas Musyawarah:</strong> Asas kekeluargaan dan gotong royong.',
+                            '<strong>Cara Pengambilan Keputusan:</strong> Utama melalui <strong>mufakat</strong> (kesepakatan bersama). Jika mufakat tidak tercapai setelah diupayakan maksimal, dilakukan <strong>voting</strong> (pemungutan suara terbanyak).',
+                            '<strong>Sikap saat Musyawarah:</strong> Menghargai pendapat orang lain, tidak memaksakan kehendak, mengacungkan tangan sebelum berbicara, dan menerima hasil keputusan dengan lapang dada.'
+                        ]
+                    }
+                ],
+                tricks: [
+                    {
+                        title: 'Rumus Emas Hak vs Kewajiban',
+                        content: '• <strong>HAK</strong> = Apa yang kita <strong>TERIMA / DAPATKAN</strong>.<br>• <strong>KEWAJIBAN</strong> = Apa yang kita <strong>LAKUKAN / BERIKAN</strong>.<br>• Urutan yang benar: <strong>Kewajiban Dulu ➡️ Baru Hak</strong>!'
+                    },
+                    {
+                        title: 'Hafal Cepat Sila ke-4 & Musyawarah',
+                        content: '• Sila ke-<strong>4</strong> = Lambang <strong>Kepala Banteng</strong> (hewan sosial yang suka berkumpul, melambangkan rakyat bermusyawarah).<br>• Keputusan No. 1 = <strong>Mufakat</strong> (bulat).<br>• Keputusan Cadangan = <strong>Voting</strong> (suara terbanyak).'
+                    }
+                ]
+            },
+            binggris: {
+                id: 'binggris',
+                name: 'Bahasa Inggris',
+                schedule: 'Rabu, 25 Nov 2026 (09.00 - 10.30)',
+                topic: 'Unit 4 and Unit 5 (Vocabulary + Grammar)',
+                color: 'bg-sky-600',
+                summary: [
+                    {
+                        title: '1. Simple Past Tense (Kejadian Masa Lampau)',
+                        points: [
+                            'Digunakan untuk menceritakan kegiatan yang sudah selesai dilakukan di masa lampau. Penanda waktu (<em>Time Signals</em>): <strong>yesterday</strong> (kemarin), <strong>last night/week/month</strong> (tadi malam/minggu lalu), <strong>two days ago</strong> (dua hari lalu).',
+                            '<strong>Kalimat Verbal (Menggunakan Kata Kerja / Verb 2):</strong><br>• (+) Subject + <strong>Verb 2</strong> + Object (Contoh: <em>She <strong>visited</strong> Bali last week.</em>)<br>• (-) Subject + <strong>did not (didn\'t) + Verb 1</strong> (Contoh: <em>She <strong>didn\'t visit</strong> Bali.</em>)<br>• (?) <strong>Did</strong> + Subject + <strong>Verb 1</strong>? (Contoh: <em><strong>Did</strong> she <strong>visit</strong> Bali?</em>)',
+                            '<strong>Regular vs Irregular Verbs:</strong><br>• <em>Regular (+ed):</em> play → played, watch → watched, study → studied.<br>• <em>Irregular (berubah bentuk):</em> go → <strong>went</strong>, eat → <strong>ate</strong>, buy → <strong>bought</strong>, see → <strong>saw</strong>, swim → <strong>swam</strong>, write → <strong>wrote</strong>.'
+                        ]
+                    },
+                    {
+                        title: '2. Nominal Past Tense (Was / Were)',
+                        points: [
+                            'Digunakan jika kalimat tidak memiliki kata kerja (diikuti kata sifat/adjective, kata benda/noun, atau tempat).',
+                            '• <strong>Was</strong> digunakan untuk subjek: <strong>I, He, She, It, Nama Tunggal</strong> (Contoh: <em>I <strong>was</strong> happy yesterday.</em>)<br>• <strong>Were</strong> digunakan untuk subjek: <strong>You, We, They, Nama Jamak</strong> (Contoh: <em>They <strong>were</strong> at the museum.</em>)'
+                        ]
+                    },
+                    {
+                        title: '3. WH-Questions (Kata Tanya)',
+                        points: [
+                            '<strong>What</strong> (Apa), <strong>Where</strong> (Di mana), <strong>When</strong> (Kapan), <strong>Who</strong> (Siapa), <strong>Why</strong> (Mengapa), <strong>How</strong> (Bagaimana).',
+                            'Contoh: <em><strong>Where did</strong> you go last holiday? I <strong>went</strong> to Yogyakarta.</em>'
+                        ]
+                    }
+                ],
+                tricks: [
+                    {
+                        title: 'Trik Anti Salah Verb 1 vs Verb 2!',
+                        content: 'Ingat mantra: <strong>"V2 hanya untuk (+) Positif! Kalau sudah ada DID atau DIDN\'T, kata kerja kembali ke V1!"</strong><br>❌ Salah: <em>I didn\'t <strong>went</strong></em><br>✅ Benar: <em>I didn\'t <strong>go</strong></em>'
+                    },
+                    {
+                        title: 'Trik Was vs Were: "I-He-She-It = WAS"',
+                        content: 'Hitung jumlah hurufnya!<br>• <strong>WAS</strong> (3 huruf) untuk subjek tunggal (<strong>I, He, She, It</strong>).<br>• <strong>WERE</strong> (4 huruf - lebih banyak) untuk subjek jamak/banyak (<strong>You, We, They</strong>).'
+                    }
+                ]
+            },
+            matematika: {
+                id: 'matematika',
+                name: 'Matematika',
+                schedule: 'Kamis, 26 Nov 2026 (07.00 - 09.00)',
+                topic: 'Keliling & Luas Bangun Datar serta Bangun Datar Gabungan',
+                color: 'bg-indigo-600',
+                summary: [
+                    {
+                        title: '1. Rumus Keliling & Luas Bangun Datar',
+                        points: [
+                            '<strong>Persegi:</strong> K = 4 × s | L = s × s',
+                            '<strong>Persegi Panjang:</strong> K = 2 × (p + l) | L = p × l',
+                            '<strong>Segitiga:</strong> K = jumlah semua sisi | L = ½ × alas × tinggi',
+                            '<strong>Jajar Genjang:</strong> K = 2 × (a + sisi miring) | L = alas × tinggi',
+                            '<strong>Trapesium:</strong> K = jumlah semua sisi | L = ½ × (a + b) × tinggi',
+                            '<strong>Belah Ketupat & Layang-layang:</strong> K = jumlah semua sisi | L = ½ × d₁ × d₂',
+                            '<strong>Lingkaran:</strong> K = π × d atau 2 × π × r | L = π × r² (dengan π = 22/7 jika r kelipatan 7, atau π = 3,14).'
+                        ]
+                    },
+                    {
+                        title: '2. Strategi Menghitung Bangun Datar Gabungan',
+                        points: [
+                            '<strong>Luas Gabungan:</strong> Potong/bagi bangun menjadi beberapa bangun dasar yang dikenal (misal: persegi panjang + segitiga, atau persegi + setengah lingkaran), hitung luas masing-masing, lalu <strong>jumlahkan</strong> (atau <strong>kurangkan</strong> jika ada bagian yang berlubang/diarsir).',
+                            '<strong>Keliling Gabungan:</strong> Keliling adalah jumlah panjang <strong>garis tepi terluar saja</strong>! Garis batas di bagian dalam yang berimpitan <strong>TIDAK BOLEH</strong> ikut dihitung.'
+                        ]
+                    }
+                ],
+                tricks: [
+                    {
+                        title: 'Trik Hafal Semua Rumus Luas dalam 3 Kelompok!',
+                        content: '• <strong>Kelompok Kotak (Tanpa ½):</strong><br>Persegi (s×s), Persegi Panjang (p×l), Jajar Genjang (a×t).<br>• <strong>Kelompok Lancip & Diagonal (Pakai ½):</strong><br>Segitiga (½×a×t), Belah Ketupat (½×d₁×d₂), Layang-layang (½×d₁×d₂), Trapesium (½×(a+b)×t).<br>• <strong>Kelompok Bulat (Pakai π):</strong><br>Lingkaran (π×r²).'
+                    },
+                    {
+                        title: 'Jebakan Keliling Bangun Gabungan!',
+                        content: 'Bayangkan kamu seekor semut yang berjalan mengelilingi pinggir luar taman. Garis di tengah-tengah taman <strong>jangan dilewati/dihitung</strong>! Pastikan juga mencari panjang sisi yang belum tertulis dengan mengurangkan sisi sejajarnya.'
+                    }
+                ]
+            },
+            mandarin: {
+                id: 'mandarin',
+                name: 'Bahasa Mandarin',
+                schedule: 'Rabu, 18 Nov 2026 (Sesuai jam kelas)',
+                topic: 'Bab 1 (Furnitur & Benda di Kamar) & Bab 2 (Pakaian, Aksesori, & Warna)',
+                color: 'bg-teal-600',
+                summary: [
+                    {
+                        title: '1. Bab 1: Furnitur & Benda di Kamar (房间里的家具 - Fángjiān lǐ de jiājù)',
+                        points: [
+                            '<strong>Furnitur Utama di Kamar:</strong><br>• <span class="font-mandarin font-bold text-sanclar-blue">床</span> (<em>chuáng</em>) = Kasur / Tempat tidur<br>• <span class="font-mandarin font-bold text-sanclar-blue">枕头</span> (<em>zhěntou</em>) = Bantal | <span class="font-mandarin font-bold text-sanclar-blue">被子</span> (<em>bèizi</em>) = Selimut<br>• <span class="font-mandarin font-bold text-sanclar-blue">衣柜</span> (<em>yīguì</em>) = Lemari baju<br>• <span class="font-mandarin font-bold text-sanclar-blue">书桌</span> (<em>shūzhuō</em>) = Meja belajar | <span class="font-mandarin font-bold text-sanclar-blue">椅子</span> (<em>yǐzi</em>) = Kursi<br>• <span class="font-mandarin font-bold text-sanclar-blue">镜子</span> (<em>jìngzi</em>) = Cermin | <span class="font-mandarin font-bold text-sanclar-blue">台灯</span> (<em>táidēng</em>) = Lampu meja<br>• <span class="font-mandarin font-bold text-sanclar-blue">书包</span> (<em>shūbāo</em>) = Tas sekolah',
+                            '<strong>Kata Letak / Posisi Benda:</strong><br>• <span class="font-mandarin font-bold text-sanclar-blue">上</span> (<em>shàng</em>) = Di atas (Contoh: 书包在床上 = Tas sekolah ada di atas tempat tidur)<br>• <span class="font-mandarin font-bold text-sanclar-blue">下</span> (<em>xià</em>) = Di bawah (Contoh: 鞋子在床下 = Sepatu ada di bawah tempat tidur)<br>• <span class="font-mandarin font-bold text-sanclar-blue">里</span> (<em>lǐ</em>) = Di dalam (Contoh: 衣服在衣柜里 = Baju ada di dalam lemari)'
+                        ]
+                    },
+                    {
+                        title: '2. Bab 2: Pakaian & Aksesori (衣服和配饰 - Yīfu hé pèishì)',
+                        points: [
+                            '<strong>Jenis Pakaian (衣服 - Yīfu):</strong><br>• <span class="font-mandarin font-bold text-sanclar-blue">校服</span> (<em>xiàofú</em>) = Seragam sekolah | <span class="font-mandarin font-bold text-sanclar-blue">上衣</span> (<em>shàngyī</em>) = Baju / Atasan<br>• <span class="font-mandarin font-bold text-sanclar-blue">短裤</span> (<em>duǎnkù</em>) = Celana pendek | <span class="font-mandarin font-bold text-sanclar-blue">长裤</span> (<em>chángkù</em>) = Celana panjang<br>• <span class="font-mandarin font-bold text-sanclar-blue">短裙</span> (<em>duǎnqún</em>) = Rok pendek | <span class="font-mandarin font-bold text-sanclar-blue">长裙</span> (<em>chángqún</em>) = Rok panjang',
+                            '<strong>Aksesori & Alas Kaki:</strong><br>• <span class="font-mandarin font-bold text-sanclar-blue">帽子</span> (<em>màozi</em>) = Topi | <span class="font-mandarin font-bold text-sanclar-blue">手表</span> (<em>shǒubiǎo</em>) = Jam tangan<br>• <span class="font-mandarin font-bold text-sanclar-blue">眼镜</span> (<em>yǎnjìng</em>) = Kacamata<br>• <span class="font-mandarin font-bold text-sanclar-blue">鞋子</span> (<em>xiézi</em>) = Sepatu | <span class="font-mandarin font-bold text-sanclar-blue">袜子</span> (<em>wàzi</em>) = Kaos kaki | <span class="font-mandarin font-bold text-sanclar-blue">拖鞋</span> (<em>tuōxié</em>) = Sandal',
+                            '<strong>Kata Kerja "Memakai" (Penting!):</strong><br>• <span class="font-mandarin font-bold text-sanclar-blue">穿</span> (<em>chuān</em>) = Memakai pakaian, celana, rok, sepatu, dan kaos kaki.<br>• <span class="font-mandarin font-bold text-sanclar-blue">戴</span> (<em>dài</em>) = Memakai aksesori (topi, jam tangan, kacamata).'
+                        ]
+                    },
+                    {
+                        title: '3. Bab 2: Warna & Pola Frasa (颜色 - Yánsè)',
+                        points: [
+                            '<strong>Kosakata Warna:</strong><br>• <span class="font-mandarin font-bold text-sanclar-blue">红色</span> (<em>hóngsè</em>) = Merah | <span class="font-mandarin font-bold text-sanclar-blue">蓝色</span> (<em>lánsè</em>) = Biru<br>• <span class="font-mandarin font-bold text-sanclar-blue">黄色</span> (<em>huángsè</em>) = Kuning | <span class="font-mandarin font-bold text-sanclar-blue">绿色</span> (<em>lǜsè</em>) = Hijau<br>• <span class="font-mandarin font-bold text-sanclar-blue">白色</span> (<em>báisè</em>) = Putih | <span class="font-mandarin font-bold text-sanclar-blue">黑色</span> (<em>hēisè</em>) = Hitam<br>• <span class="font-mandarin font-bold text-sanclar-blue">粉红色</span> (<em>fěnhóngsè</em>) = Merah muda (Pink) | <span class="font-mandarin font-bold text-sanclar-blue">棕色</span> (<em>zōngsè</em>) = Cokelat',
+                            '<strong>Pola Kalimat Warna + Benda:</strong><br>Rumus: <strong>Warna + 的 (<em>de</em>) + Pakaian/Aksesori</strong>.<br>Contoh: <span class="font-mandarin font-bold text-sanclar-blue">白色的校服</span> (<em>báisè de xiàofú</em>) = Seragam sekolah berwarna putih; <span class="font-mandarin font-bold text-sanclar-blue">黑色的鞋子</span> (<em>hēisè de xiézi</em>) = Sepatu berwarna hitam.'
+                        ]
+                    }
+                ],
+                tricks: [
+                    {
+                        title: 'Trik "Kù" vs "Qún" & "Duǎn" vs "Cháng"!',
+                        content: '• <strong>短 (duǎn)</strong> = Pendek | <strong>长 (cháng)</strong> = Panjang.<br>• <strong>裤 (kù)</strong> = Celana (ingat: <strong>Kù</strong> = <strong>K</strong>ulot/celana) → <em>duǎnkù</em> (celana pendek), <em>chángkù</em> (celana panjang).<br>• <strong>裙 (qún)</strong> = Rok (ingat: <strong>Qún</strong> = ga<strong>un</strong>/rok) → <em>duǎnqún</em> (rok pendek), <em>chángqún</em> (rok panjang).'
+                    },
+                    {
+                        title: 'Trik Anti Tertukar: 穿 (chuān) vs 戴 (dài)',
+                        content: '• <strong>穿 (chuān)</strong> = Menutup badan & kaki (baju, seragam, celana, rok, sepatu, kaos kaki).<br>• <strong>戴 (dài)</strong> = Nempel di kepala, mata, & tangan (<strong>topi, kacamata, jam tangan</strong>). Ingat saja: <em>"Dài untuk Aksesori!"</em>'
+                    },
+                    {
+                        title: 'Jembatan Keledai Benda Kamar & Warna',
+                        content: '• <strong>镜子 (jìngzi)</strong> = Cermin (bunyinya mirip <em>"cling"</em> mengilap!).<br>• <strong>书包 (shūbāo)</strong> = Tas sekolah (<em>shū</em> = buku, <em>bāo</em> = tas/bungkus → tas buku!).<br>• <strong>手表 (shǒubiǎo)</strong> = Jam tangan (<em>shǒu</em> = tangan, <em>biǎo</em> = jam).<br>• Semua kata warna diakhiri dengan <strong>色 (sè)</strong> yang artinya warna!'
+                    }
+                ]
+            }
+        };
+
+        // ==================== BANK SOAL LENGKAP (PG, B/S, ISIAN, URAIAN) ====================
+        // Setiap mapel memiliki 8 soal: 3 PG, 2 Benar/Salah, 2 Isian Singkat, 1 Uraian
+        const QUESTION_BANK = [
+            // --- BAHASA JAWA ---
+            {
+                id: 'jw_1', subject: 'jawa', type: 'PG',
+                question: 'Sandhangan swara sing dienggo ngowahi swara vokal /a/ dadi /o/ (tuladhane ing tembung "soto") yaiku ....',
+                options: ['Wulu lan suku', 'Taling tarung', 'Pepet', 'Taling'],
+                answer: 'Taling tarung',
+                explanation: 'Taling tarung ( ꦺꦴ ) gunane kanggo ngowahi swara vokal /a/ dadi /o/, dene taling ( ꦺ ) kanggo swara /é/.'
+            },
+            {
+                id: 'jw_2', subject: 'jawa', type: 'PG',
+                question: 'Nalika maca geguritan, bab sing gegayutan karo cendhek-dhuwure swara, intonasi, lan mandhege ukara (jeda) diarani ....',
+                options: ['Wiraga', 'Wirasa', 'Wirama', 'Wicara'],
+                answer: 'Wirama',
+                explanation: 'Wirama yaiku irama utawa cendhek-dhuwure swara lan intonasi nalika maca geguritan. Wiraga = gerak tubuh, Wirasa = penghayatan, Wicara = artikulasi.'
+            },
+            {
+                id: 'jw_3', subject: 'jawa', type: 'PG',
+                question: 'Tembung "kacang" yen ditulis nganggo aksara Jawa mbutuhake sandhangan panyigeg wanda wujud ....',
+                options: ['Wignyan ( ꦃ )', 'Layar ( ꦂ )', 'Cecak ( ꦁ )', 'Pangkon ( ꧀ )'],
+                answer: 'Cecak ( ꦁ )',
+                explanation: 'Swara mati "-ng" ing pungkasane wanda migunakake sandhangan cecak ( ꦁ ). Wignyan kanggo mati -h, layar kanggo mati -r.'
+            },
+            {
+                id: 'jw_4', subject: 'jawa', type: 'BS',
+                question: 'Pernyataan: Geguritan gagrag anyar kaiket dening aturan guru gatra, guru wilangan, lan guru lagu kaya dene tembang macapat.',
+                answer: 'Salah',
+                explanation: 'Salah! Sing kaiket guru gatra, guru wilangan, lan guru lagu iku tembang macapat, dene geguritan gagrag anyar sifatipun bebas.'
+            },
+            {
+                id: 'jw_5', subject: 'jawa', type: 'BS',
+                question: 'Pernyataan: Sandhangan "pepet" ( ꦼ ) dienggo kanggo swara /ê/ kaya ing tembung "segara" utawa "sega".',
+                answer: 'Benar',
+                explanation: 'Benar! Pepet kanggo swara /ê/ (pepet), tuladhane sega, lemah, lan segara.'
+            },
+            {
+                id: 'jw_6', subject: 'jawa', type: 'ISIAN',
+                question: 'Cacahe aksara Jawa nglegena (carakan Ha-Na-Ca-Ra-Ka) kabeh ana ... aksara.',
+                idealAnswer: '20 atau rong puluh',
+                explanation: 'Aksara Jawa nglegena kabeh cacahe ana 20 (rong puluh), wiwit saka Ha nganti Nga.'
+            },
+            {
+                id: 'jw_7', subject: 'jawa', type: 'ISIAN',
+                question: 'Sandhangan panyigeg wanda sing dienggo kanggo nutup swara mati "-r" ing pungkasane tembung "pasar" diarani ....',
+                idealAnswer: 'layar',
+                explanation: 'Kanggo mateni aksara "-r" ing pungkasane wanda dienggo sandhangan layar ( ꦂ ).'
+            },
+            {
+                id: 'jw_8', subject: 'jawa', type: 'URAIAN',
+                question: 'Sebutna lan jlentrehna 3 bab (3W) sing kudu digatekake nalika maca geguritan ing ngarep kelas!',
+                idealAnswer: '1. Wirama: intonasi, cendhek-dhuwure swara, lan jeda. 2. Wirasa: penghayatan utawa ekspresi perasaan isi geguritan. 3. Wiraga: gerak awak (gestur) sing luwes lan ora kaku. (Bisa uga Wicara: cethane pangucapan tembung).',
+                explanation: 'Nalika maca geguritan kudu nggatekake Wirama (intonasi swara), Wirasa (penghayatan), Wiraga (gerak awak), lan Wicara (artikulasi).'
+            },
+
+            // --- IPAS ---
+            {
+                id: 'ipas_1', subject: 'ipas', type: 'PG',
+                question: 'Sistem pengairan sawah tradisional di Bali yang dikelola secara adil berlandaskan filosofi Tri Hita Karana disebut ....',
+                options: ['Sasi', 'Subak', 'Ngaben', 'Fahombo'],
+                answer: 'Subak',
+                explanation: 'Subak adalah organisasi kemasyarakatan di Bali yang khusus mengatur sistem pengairan sawah (irigasi) secara tradisional dan adil.'
+            },
+            {
+                id: 'ipas_2', subject: 'ipas', type: 'PG',
+                question: 'Masyarakat Maluku dan Papua memiliki kearifan lokal berupa larangan adat mengambil hasil laut atau hutan dalam jangka waktu tertentu agar ekosistem pulih kembali. Tradisi ini dinamakan ....',
+                options: ['Sasi', 'Nyadran', 'Sekaten', 'Rambu Solo'],
+                answer: 'Sasi',
+                explanation: 'Sasi merupakan hukum adat di Maluku dan Papua yang melarang pengambilan sumber daya alam tertentu sementara waktu demi kelestarian lingkungan.'
+            },
+            {
+                id: 'ipas_3', subject: 'ipas', type: 'PG',
+                question: 'Berikut ini yang BUKAN merupakan manfaat menjaga kearifan lokal bagi bangsa Indonesia adalah ....',
+                options: [
+                    'Menjaga kelestarian alam dan mencegah bencana lingkungan',
+                    'Mempererat persatuan dan gotong royong antarwarga',
+                    'Menimbulkan rasa paling unggul dibanding daerah lain',
+                    'Memperkuat identitas budaya bangsa di tingkat dunia'
+                ],
+                answer: 'Menimbulkan rasa paling unggul dibanding daerah lain',
+                explanation: 'Kearifan lokal justru menumbuhkan sikap saling menghormati dan persatuan, bukan rasa sombong atau merendahkan daerah lain.'
+            },
+            {
+                id: 'ipas_4', subject: 'ipas', type: 'BS',
+                question: 'Pernyataan: Tradisi Fahombo (lompat batu) berasal dari Pulau Nias, Sumatera Utara dan melambangkan kedewasaan serta ketangkasan seorang pemuda.',
+                answer: 'Benar',
+                explanation: 'Benar! Fahombo adalah tradisi lompat batu setinggi ±2 meter dari Nias sebagai simbol kedewasaan dan keberanian pemuda.'
+            },
+            {
+                id: 'ipas_5', subject: 'ipas', type: 'BS',
+                question: 'Pernyataan: Kearifan lokal bersifat kaku dan tidak boleh dilestarikan oleh generasi muda karena sudah ketinggalan zaman.',
+                answer: 'Salah',
+                explanation: 'Salah! Kearifan lokal mengandung nilai luhur pelestarian alam dan persatuan sehingga wajib dijaga dan dilestarikan generasi muda.'
+            },
+            {
+                id: 'ipas_6', subject: 'ipas', type: 'ISIAN',
+                question: 'Landasan filosofi sistem Subak di Bali yang mengajarkan keharmonisan hubungan manusia dengan Tuhan, sesama, dan alam disebut Tri ... Karana.',
+                idealAnswer: 'Hita',
+                explanation: 'Tri Hita Karana berarti tiga penyebab kebahagiaan/keharmonisan (Parahyangan, Pawongan, dan Palemahan).'
+            },
+            {
+                id: 'ipas_7', subject: 'ipas', type: 'ISIAN',
+                question: 'Tradisi gotong royong di masyarakat Jawa untuk membantu tetangga membangun rumah atau membersihkan desa disebut gugur gunung atau ....',
+                idealAnswer: 'sambatan',
+                explanation: 'Sambatan atau gugur gunung adalah tradisi gotong royong masyarakat Jawa yang mempererat kerukunan warga.'
+            },
+            {
+                id: 'ipas_8', subject: 'ipas', type: 'URAIAN',
+                question: 'Jelaskan bagaimana kearifan lokal "Sasi" di Maluku dapat menjaga kelestarian alam sekaligus mempererat persatuan masyarakat!',
+                idealAnswer: 'Sasi melarang warga mengambil hasil laut/hutan sebelum waktunya sehingga ikan dan tumbuhan punya waktu berkembang biak dan alam tetap lestari. Selain itu, aturan Sasi ditaati bersama oleh seluruh warga dengan rasa tanggung jawab sehingga menciptakan keadilan dan kerukunan.',
+                explanation: 'Sasi memberi waktu bagi alam untuk memulihkan diri (regenerasi) dan melatih kedisiplinan serta kebersamaan warga dalam menjaga milik bersama.'
+            },
+
+            // --- AGAMA KATOLIK ---
+            {
+                id: 'ag_1', subject: 'agama', type: 'PG',
+                question: 'Dalam suratnya kepada jemaat di Korintus (1 Korintus 12:12-27), Santo Paulus menggambarkan keberagaman umat beriman bagaikan ....',
+                options: [
+                    'Banyak ranting yang terpisah dari pohon',
+                    'Banyak anggota, tetapi satu tubuh',
+                    'Batu-batu yang berserakan di jalan',
+                    'Rumah yang dibangun di atas pasir'
+                ],
+                answer: 'Banyak anggota, tetapi satu tubuh',
+                explanation: 'Santo Paulus mengajarkan bahwa meski memiliki karunia dan peran berbeda-beda, kita semua adalah satu tubuh di dalam Kristus.'
+            },
+            {
+                id: 'ag_2', subject: 'agama', type: 'PG',
+                question: 'Dokumen Konsili Vatikan II yang secara khusus membahas hubungan Gereja Katolik dengan agama-agama bukan Kristiani serta mendorong sikap hormat dan dialog adalah ....',
+                options: ['Lumen Gentium', 'Nostra Aetate', 'Gaudium et Spes', 'Dei Verbum'],
+                answer: 'Nostra Aetate',
+                explanation: 'Nostra Aetate (Pada Zaman Kita) menegaskan bahwa Gereja Katolik menghormati segala hal yang benar dan suci dalam agama-agama lain.'
+            },
+            {
+                id: 'ag_3', subject: 'agama', type: 'PG',
+                question: 'Melalui kisah perumpamaan "Orang Samaria yang Murah Hati" (Lukas 10:25-37), Yesus mengajarkan kita untuk ....',
+                options: [
+                    'Hanya menolong orang yang satu suku dengan kita',
+                    'Menolong siapa saja yang menderita tanpa memandang perbedaan',
+                    'Menghindari orang asing yang sedang kesusahan',
+                    'Meminta imbalan setelah berbuat baik'
+                ],
+                answer: 'Menolong siapa saja yang menderita tanpa memandang perbedaan',
+                explanation: 'Orang Samaria menolong orang Yahudi yang dirampok meskipun kedua bangsa itu bermusuhan. Cinta kasih melampaui batas suku dan agama.'
+            },
+            {
+                id: 'ag_4', subject: 'agama', type: 'BS',
+                question: 'Pernyataan: Dalam iman Katolik, keberagaman suku, budaya, dan agama di Indonesia dipandang sebagai anugerah Tuhan yang memperkaya kehidupan bersama.',
+                answer: 'Benar',
+                explanation: 'Benar! Keberagaman adalah ciptaan dan anugerah Tuhan yang indah agar manusia saling melengkapi dan mengasihi.'
+            },
+            {
+                id: 'ag_5', subject: 'agama', type: 'BS',
+                question: 'Pernyataan: Wujud toleransi antarumat beragama berarti kita boleh mengganggu teman yang sedang berdoa asalkan hanya bercanda.',
+                answer: 'Salah',
+                explanation: 'Salah! Sikap toleransi sejati justru menjaga ketenangan dan menghormati teman yang sedang menjalankan ibadahnya.'
+            },
+            {
+                id: 'ag_6', subject: 'agama', type: 'ISIAN',
+                question: 'Yesus mengajarkan Hukum Cinta Kasih: Kasihilah Tuhan Allahmu dengan segenap hatimu, dan kasihilah ... manusia seperti dirimu sendiri.',
+                idealAnswer: 'sesama',
+                explanation: 'Hukum Cinta Kasih (Matius 22:37-39) memerintahkan kita mengasihi Tuhan dan mengasihi sesama manusia seperti diri sendiri.'
+            },
+            {
+                id: 'ag_7', subject: 'agama', type: 'ISIAN',
+                question: 'Di dekat sumur Yakub, Yesus berdialog dengan penuh kasih kepada seorang perempuan dari bangsa ... yang saat itu dijauhi oleh orang Yahudi.',
+                idealAnswer: 'Samaria',
+                explanation: 'Kisah Yesus dan Perempuan Samaria (Yohanes 4) menunjukkan bahwa Yesus merangkul semua orang tanpa diskriminasi.'
+            },
+            {
+                id: 'ag_8', subject: 'agama', type: 'URAIAN',
+                question: 'Tuliskan 2 contoh tindakan nyata yang dapat kamu lakukan di lingkungan sekolah atau rumah untuk mewujudkan persatuan dan toleransi dengan teman yang berbeda agama!',
+                idealAnswer: '1. Tidak mengganggu teman yang sedang beribadah/berdoa. 2. Bermain, belajar kelompok, dan bekerja bakti bersama tanpa membeda-bedakan agama. 3. Mengucapkan selamat hari raya kepada teman yang merayakan.',
+                explanation: 'Toleransi diwujudkan lewat tindakan menghormati ibadah teman, berteman tanpa pilih kasih, dan bekerja sama dalam kebaikan.'
+            },
+
+            // --- BAHASA INDONESIA ---
+            {
+                id: 'bi_1', subject: 'bindo', type: 'PG',
+                question: 'Bacalah kutipan teks berikut!\n"Ayo, kurangi penggunaan kantong plastik sekali pakai! Bawalah tas belanja kain dari rumah demi menyelamatkan bumi kita dari pencemaran."\nKutipan tersebut termasuk jenis teks ....',
+                options: ['Narasi', 'Deskripsi', 'Persuasi', 'Eksposisi'],
+                answer: 'Persuasi',
+                explanation: 'Teks persuasi bertujuan mengajak atau membujuk pembaca melakukan sesuatu, ditandai dengan kata ajakan seperti "Ayo".'
+            },
+            {
+                id: 'bi_2', subject: 'bindo', type: 'PG',
+                question: 'Manakah di bawah ini yang merupakan contoh kalimat majemuk setara?',
+                options: [
+                    'Ibu memasak di dapur ketika ayah mencuci mobil.',
+                    'Rina rajin belajar sehingga ia meraih juara kelas.',
+                    'Kakak gemar bermain gitar, sedangkan adik gemar melukis.',
+                    'Kami tetap berangkat ke sekolah meskipun hujan turun.'
+                ],
+                answer: 'Kakak gemar bermain gitar, sedangkan adik gemar melukis.',
+                explanation: 'Konjungsi "sedangkan" menghubungkan dua klausa yang kedudukannya sejajar (kalimat majemuk setara perlawanan).'
+            },
+            {
+                id: 'bi_3', subject: 'bindo', type: 'PG',
+                question: 'Saat mengisi formulir pendaftaran lomba, bagian akhir formulir biasanya berisi ....',
+                options: [
+                    'Judul dan nomor formulir',
+                    'Petunjuk cara pengisian',
+                    'Tempat, tanggal pengisian, tanda tangan, dan nama terang',
+                    'Daftar riwayat penyakit'
+                ],
+                answer: 'Tempat, tanggal pengisian, tanda tangan, dan nama terang',
+                explanation: 'Struktur penutup formulir berisi tempat dan tanggal pengisian serta tanda tangan dan nama terang sebagai bukti keabsahan data.'
+            },
+            {
+                id: 'bi_4', subject: 'bindo', type: 'BS',
+                question: 'Pernyataan: Teks deskripsi bertujuan menggambarkan suatu objek atau tempat secara rinci sehingga pembaca seolah-olah dapat melihat atau merasakannya sendiri.',
+                answer: 'Benar',
+                explanation: 'Benar! Teks deskripsi melukiskan objek secara detail melibatkan pancaindra pembaca.'
+            },
+            {
+                id: 'bi_5', subject: 'bindo', type: 'BS',
+                question: 'Pernyataan: Kalimat "Beni tidak masuk sekolah karena sakit demam" merupakan contoh kalimat majemuk setara.',
+                answer: 'Salah',
+                explanation: 'Salah! Konjungsi "karena" menunjukkan hubungan sebab-akibat antara induk kalimat dan anak kalimat, sehingga disebut kalimat majemuk bertingkat.'
+            },
+            {
+                id: 'bi_6', subject: 'bindo', type: 'ISIAN',
+                question: 'Jenis teks yang menceritakan rangkaian peristiwa secara berurutan dari awal hingga akhir (memiliki tokoh dan alur) disebut teks ....',
+                idealAnswer: 'narasi',
+                explanation: 'Teks narasi menyajikan cerita atau kejadian secara kronologis (urutan waktu).'
+            },
+            {
+                id: 'bi_7', subject: 'bindo', type: 'ISIAN',
+                question: 'Gabungkan dua kalimat berikut menjadi kalimat majemuk bertingkat menggunakan konjungsi tujuan: "Siska berlatih renang setiap sore. Siska ingin memenangkan kejuaraan." -> Siska berlatih renang setiap sore ... memenangkan kejuaraan.',
+                idealAnswer: 'agar atau supaya',
+                explanation: 'Konjungsi "agar" atau "supaya" menyatakan hubungan tujuan dalam kalimat majemuk bertingkat.'
+            },
+            {
+                id: 'bi_8', subject: 'bindo', type: 'URAIAN',
+                question: 'Jelaskan perbedaan utama antara teks eksposisi dan teks argumentasi, lalu buatlah 1 contoh kalimat majemuk setara!',
+                idealAnswer: 'Teks eksposisi bertujuan memaparkan informasi/pengetahuan secara netral untuk menambah wawasan, sedangkan teks argumentasi bertujuan meyakinkan pembaca dengan pendapat yang disertai bukti/alasan kuat. Contoh kalimat majemuk setara: Andi membaca buku dan Budi menulis ringkasan.',
+                explanation: 'Eksposisi bersifat informatif objektif, argumentasi bersifat meyakinkan pendapat. Kalimat majemuk setara memakai konjungsi seperti dan, tetapi, atau, sedangkan.'
+            },
+
+            // --- PENDIDIKAN PANCASILA ---
+            {
+                id: 'pp_1', subject: 'pancasila', type: 'PG',
+                question: 'Kegiatan musyawarah untuk mencapai mufakat merupakan pengamalan Pancasila khususnya sila ke-....',
+                options: ['Dua', 'Tiga', 'Empat', 'Lima'],
+                answer: 'Empat',
+                explanation: 'Sila ke-4 "Kerakyatan yang dipimpin oleh hikmat kebijaksanaan dalam permusyawaratan/perwakilan" menegaskan pentingnya musyawarah.'
+            },
+            {
+                id: 'pp_2', subject: 'pancasila', type: 'PG',
+                question: 'Apabila dalam sebuah musyawarah kelas tidak tercapai kata mufakat meskipun sudah berdiskusi dengan baik, langkah selanjutnya yang dapat diambil adalah ....',
+                options: [
+                    'Membubarkan rapat tanpa keputusan',
+                    'Memaksakan pendapat ketua kelas',
+                    'Melakukan pemungutan suara terbanyak (voting)',
+                    'Bertengkar hingga ada yang mengalah'
+                ],
+                answer: 'Melakukan pemungutan suara terbanyak (voting)',
+                explanation: 'Jika musyawarah mufakat belum menghasilkan kesepakatan, keputusan dapat diambil melalui voting (suara terbanyak) secara demokratis.'
+            },
+            {
+                id: 'pp_3', subject: 'pancasila', type: 'PG',
+                question: 'Contoh pelaksanaan kewajiban siswa di lingkungan sekolah yang tepat adalah ....',
+                options: [
+                    'Mendapatkan nilai ulangan dari guru',
+                    'Menggunakan fasilitas perpustakaan sekolah',
+                    'Melaksanakan piket kebersihan kelas sesuai jadwal',
+                    'Mendapat perlindungan saat berada di sekolah'
+                ],
+                answer: 'Melaksanakan piket kebersihan kelas sesuai jadwal',
+                explanation: 'Melaksanakan piket kelas adalah tanggung jawab yang harus dilakukan siswa (kewajiban), sedangkan opsi lainnya adalah hak siswa.'
+            },
+            {
+                id: 'pp_4', subject: 'pancasila', type: 'BS',
+                question: 'Pernyataan: Pelaksanaan hak dan kewajiban harus dilakukan secara seimbang dengan mendahulukan kewajiban sebelum menuntut hak.',
+                answer: 'Benar',
+                explanation: 'Benar! Keseimbangan hak dan kewajiban menciptakan ketertiban dan keadilan dalam kehidupan bersama.'
+            },
+            {
+                id: 'pp_5', subject: 'pancasila', type: 'BS',
+                question: 'Pernyataan: Jika usulan kita tidak diterima dalam musyawarah, kita boleh menolak melaksanakan hasil keputusan bersama tersebut.',
+                answer: 'Salah',
+                explanation: 'Salah! Keputusan musyawarah yang sudah disepakati wajib diterima dan dilaksanakan bersama dengan penuh tanggung jawab.'
+            },
+            {
+                id: 'pp_6', subject: 'pancasila', type: 'ISIAN',
+                question: 'Musyawarah di Indonesia dilaksanakan berlandaskan asas ... dan gotong royong.',
+                idealAnswer: 'kekeluargaan',
+                explanation: 'Musyawarah dalam demokrasi Pancasila dilandasi asas kekeluargaan dan semangat persaudaraan.'
+            },
+            {
+                id: 'pp_7', subject: 'pancasila', type: 'ISIAN',
+                question: 'Segala sesuatu yang mutlak harus kita dapatkan atau terima setelah melaksanakan tanggung jawab disebut ....',
+                idealAnswer: 'hak',
+                explanation: 'Hak adalah sesuatu yang semestinya diterima oleh seseorang.'
+            },
+            {
+                id: 'pp_8', subject: 'pancasila', type: 'URAIAN',
+                question: 'Sebutkan 3 sikap terpuji yang harus diterapkan saat mengikuti musyawarah di kelas agar berjalan lancar!',
+                idealAnswer: '1. Menghargai pendapat teman yang berbeda. 2. Tidak memaksakan kehendak pribadi. 3. Mengacungkan tangan sebelum berbicara dan tidak memotong pembicaraan orang lain. 4. Menerima hasil keputusan dengan lapang dada.',
+                explanation: 'Sikap menghargai pendapat, santun saat berbicara, tidak memaksakan kehendak, dan lapang dada membuat musyawarah berjalan harmonis.'
+            },
+
+            // --- BAHASA INGGRIS ---
+            {
+                id: 'en_1', subject: 'binggris', type: 'PG',
+                question: 'My family and I ... to Malang Zoo last Sunday. We saw many animals there.',
+                options: ['go', 'goes', 'went', 'going'],
+                answer: 'went',
+                explanation: 'Penanda waktu "last Sunday" menunjukkan Simple Past Tense, sehingga menggunakan Verb 2 dari "go" yaitu "went".'
+            },
+            {
+                id: 'en_2', subject: 'binggris', type: 'PG',
+                question: 'Kevin: "Did you play football yesterday afternoon?"\nRafael: "No, I didn\'t. I ... my homework at home."',
+                options: ['do', 'did', 'done', 'doing'],
+                answer: 'did',
+                explanation: 'Kalimat kedua merupakan kalimat positif bentuk lampau (Simple Past Tense), sehingga memakai Verb 2 dari "do" yaitu "did".'
+            },
+            {
+                id: 'en_3', subject: 'binggris', type: 'PG',
+                question: 'The students ... very excited during the science museum trip two days ago.',
+                options: ['was', 'were', 'is', 'are'],
+                answer: 'were',
+                explanation: 'Subjek "The students" adalah jamak (they) dan waktunya lampau ("two days ago"), sehingga to be yang tepat adalah "were".'
+            },
+            {
+                id: 'en_4', subject: 'binggris', type: 'BS',
+                question: 'Statement: In Simple Past Tense, the correct negative sentence is "She didn\'t bought a new book yesterday."',
+                answer: 'Salah',
+                explanation: 'Salah! Setelah "didn\'t" kata kerja harus kembali ke bentuk dasar (Verb 1), yaitu "buy" -> "She didn\'t buy a new book yesterday."'
+            },
+            {
+                id: 'en_5', subject: 'binggris', type: 'BS',
+                question: 'Statement: We use "was" for singular subjects such as I, He, She, and It in the past tense.',
+                answer: 'Benar',
+                explanation: 'Benar! "Was" digunakan untuk subjek tunggal (I, He, She, It) pada kalimat nominal bentuk lampau.'
+            },
+            {
+                id: 'en_6', subject: 'binggris', type: 'ISIAN',
+                question: 'Change the verb in brackets into the correct past form (Verb 2): "Yesterday, my mother ... (cook) delicious fried rice for breakfast."',
+                idealAnswer: 'cooked',
+                explanation: '"Cook" adalah regular verb, sehingga bentuk Verb 2-nya ditambah -ed menjadi "cooked".'
+            },
+            {
+                id: 'en_7', subject: 'binggris', type: 'ISIAN',
+                question: 'Complete the question word: "... did you go on your last holiday? I went to Bali."',
+                idealAnswer: 'Where',
+                explanation: 'Karena jawabannya menunjukkan tempat ("to Bali"), kata tanya yang tepat adalah "Where" (Di mana / Ke mana).'
+            },
+            {
+                id: 'en_8', subject: 'binggris', type: 'URAIAN',
+                question: 'Write 2 simple sentences in English using Simple Past Tense to tell what you did last weekend! (Use Verb 2)',
+                idealAnswer: 'Contoh: 1. Last weekend, I visited my grandmother in Sidoarjo. 2. I played badminton with my brother and ate delicious food.',
+                explanation: 'Gunakan subjek + Verb 2 (seperti visited, played, studied, went, ate, watched) untuk menceritakan kegiatan akhir pekan lalu.'
+            },
+
+            // --- MATEMATIKA ---
+            {
+                id: 'mtk_1', subject: 'matematika', type: 'PG',
+                question: 'Sebuah taman berbentuk lingkaran memiliki jari-jari 14 meter. Luas taman tersebut adalah .... (π = 22/7)',
+                options: ['88 m²', '154 m²', '308 m²', '616 m²'],
+                answer: '616 m²',
+                explanation: 'L = π × r² = (22/7) × 14 × 14 = 22 × 2 × 14 = 616 m².'
+            },
+            {
+                id: 'mtk_2', subject: 'matematika', type: 'PG',
+                question: 'Sebuah trapesium memiliki panjang sisi sejajar 12 cm dan 18 cm, serta tinggi 10 cm. Luas trapesium tersebut adalah ....',
+                options: ['150 cm²', '300 cm²', '216 cm²', '120 cm²'],
+                answer: '150 cm²',
+                explanation: 'L = ½ × (a + b) × t = ½ × (12 + 18) × 10 = ½ × 30 × 10 = 150 cm².'
+            },
+            {
+                id: 'mtk_3', subject: 'matematika', type: 'PG',
+                question: 'Bangun datar gabungan terdiri dari sebuah persegi panjang berukuran 20 cm × 10 cm yang di atasnya menempel segitiga dengan alas 20 cm dan tinggi 8 cm. Luas gabungan bangun tersebut adalah ....',
+                options: ['200 cm²', '280 cm²', '360 cm²', '160 cm²'],
+                answer: '280 cm²',
+                explanation: 'Luas persegi panjang = 20 × 10 = 200 cm². Luas segitiga = ½ × 20 × 8 = 80 cm². Luas gabungan = 200 + 80 = 280 cm².'
+            },
+            {
+                id: 'mtk_4', subject: 'matematika', type: 'BS',
+                question: 'Pernyataan: Rumus untuk menghitung luas belah ketupat dan layang-layang adalah sama, yaitu ½ × diagonal 1 × diagonal 2.',
+                answer: 'Benar',
+                explanation: 'Benar! Baik belah ketupat maupun layang-layang memiliki dua diagonal yang saling tegak lurus sehingga luasnya = ½ × d₁ × d₂.'
+            },
+            {
+                id: 'mtk_5', subject: 'matematika', type: 'BS',
+                question: 'Pernyataan: Saat menghitung keliling bangun datar gabungan, garis batas di bagian dalam yang saling berimpitan harus ikut dijumlahkan.',
+                answer: 'Salah',
+                explanation: 'Salah! Keliling bangun datar gabungan hanya menjumlahkan panjang seluruh sisi bagian luar saja.'
+            },
+            {
+                id: 'mtk_6', subject: 'matematika', type: 'ISIAN',
+                question: 'Keliling sebuah persegi yang memiliki luas 64 cm² adalah ... cm.',
+                idealAnswer: '32',
+                explanation: 'Jika L = 64 cm², maka panjang sisi s = √64 = 8 cm. Keliling = 4 × 8 = 32 cm.'
+            },
+            {
+                id: 'mtk_7', subject: 'matematika', type: 'ISIAN',
+                question: 'Sebuah setengah lingkaran memiliki diameter 14 cm. Keliling bangun setengah lingkaran tertutup tersebut adalah ... cm. (π = 22/7)',
+                idealAnswer: '36',
+                explanation: 'Keliling setengah lingkaran tertutup = (½ × π × d) + d = (½ × 22/7 × 14) + 14 = 22 + 14 = 36 cm.'
+            },
+            {
+                id: 'mtk_8', subject: 'matematika', type: 'URAIAN',
+                question: 'Sebuah halaman sekolah berbentuk persegi panjang dengan panjang 25 meter dan lebar 16 meter. Di tengah halaman dibuat kolam berbentuk persegi dengan panjang sisi 6 meter. Hitunglah luas halaman yang tidak terkena kolam! Tuliskan langkahnya!',
+                idealAnswer: 'Luas halaman = 25 m × 16 m = 400 m². Luas kolam = 6 m × 6 m = 36 m². Luas halaman di luar kolam = 400 m² - 36 m² = 364 m².',
+                explanation: 'Hitung luas persegi panjang (25 × 16 = 400 m²), lalu kurangi dengan luas kolam persegi (6 × 6 = 36 m²), hasilnya 364 m².'
+            },
+
+            // --- BAHASA MANDARIN ---
+            {
+                id: 'md_1', subject: 'mandarin', type: 'PG',
+                question: 'Kosakata Bahasa Mandarin untuk furnitur kamar "Kasur / Tempat tidur" dan "Bantal" secara berurutan adalah ....',
+                options: [
+                    '书桌 (shūzhuō) dan 椅子 (yǐzi)',
+                    '床 (chuáng) dan 枕头 (zhěntou)',
+                    '衣柜 (yīguì) dan 镜子 (jìngzi)',
+                    '书包 (shūbāo) dan 被子 (bèizi)'
+                ],
+                answer: '床 (chuáng) dan 枕头 (zhěntou)',
+                explanation: '床 (chuáng) artinya kasur/tempat tidur, sedangkan 枕头 (zhěntou) artinya bantal. 被子 (bèizi) adalah selimut.'
+            },
+            {
+                id: 'md_2', subject: 'mandarin', type: 'PG',
+                question: 'Perhatikan kalimat berikut:\n"我的书包在书桌上。" (Wǒ de shūbāo zài shūzhuō shàng.)\nArti dari kalimat tersebut dalam Bahasa Indonesia adalah ....',
+                options: [
+                    'Tas sekolah saya ada di bawah tempat tidur.',
+                    'Tas sekolah saya ada di dalam lemari baju.',
+                    'Tas sekolah saya ada di atas meja belajar.',
+                    'Cermin saya ada di atas kursi.'
+                ],
+                answer: 'Tas sekolah saya ada di atas meja belajar.',
+                explanation: '书包 (shūbāo) = tas sekolah, 书桌 (shūzhuō) = meja belajar, 上 (shàng) = di atas.'
+            },
+            {
+                id: 'md_3', subject: 'mandarin', type: 'PG',
+                question: 'Jika ingin mengatakan "Celana panjang berwarna biru" dalam Bahasa Mandarin, frasa yang tepat adalah ....',
+                options: [
+                    '红色的短裙 (hóngsè de duǎnqún)',
+                    '蓝色的长裤 (lánsè de chángkù)',
+                    '白色的校服 (báisè de xiàofú)',
+                    '黑色的短裤 (hēisè de duǎnkù)'
+                ],
+                answer: '蓝色的长裤 (lánsè de chángkù)',
+                explanation: '蓝色 (lánsè) = biru, 的 (de) = kata hubung sifat, 长裤 (chángkù) = celana panjang (长 = panjang, 裤 = celana).'
+            },
+            {
+                id: 'md_4', subject: 'mandarin', type: 'BS',
+                question: 'Pernyataan: Kata kerja "戴" (dài) digunakan untuk memakai aksesori seperti topi (帽子 màozi), jam tangan (手表 shǒubiǎo), dan kacamata (眼镜 yǎnjìng).',
+                answer: 'Benar',
+                explanation: 'Benar! 戴 (dài) digunakan untuk aksesori seperti topi, kacamata, dan jam tangan, sedangkan 穿 (chuān) digunakan untuk pakaian, celana, rok, sepatu, dan kaos kaki.'
+            },
+            {
+                id: 'md_5', subject: 'mandarin', type: 'BS',
+                question: 'Pernyataan: Kosakata "短裙" (duǎnqún) memiliki arti celana pendek, sedangkan "拖鞋" (tuōxié) berarti kaos kaki.',
+                answer: 'Salah',
+                explanation: 'Salah! 短裙 (duǎnqún) artinya rok pendek (celana pendek adalah 短裤 duǎnkù), dan 拖鞋 (tuōxié) artinya sandal (kaos kaki adalah 袜子 wàzi).'
+            },
+            {
+                id: 'md_6', subject: 'mandarin', type: 'ISIAN',
+                question: 'Benda di dalam kamar yang digunakan untuk bercermin sebelum berangkat sekolah dalam pinyin Mandarin disebut ....',
+                idealAnswer: 'jingzi atau jìngzi',
+                explanation: '镜子 (jìngzi) berarti cermin.'
+            },
+            {
+                id: 'md_7', subject: 'mandarin', type: 'ISIAN',
+                question: 'Lengkapilah frasa berikut dalam Bahasa Mandarin (tulis Pinyin): "Seragam sekolah berwarna putih" = ... de xiàofú.',
+                idealAnswer: 'baise atau báisè',
+                explanation: '白色 (báisè) artinya warna putih, sehingga 白色的校服 (báisè de xiàofú) berarti seragam sekolah berwarna putih.'
+            },
+            {
+                id: 'md_8', subject: 'mandarin', type: 'URAIAN',
+                question: 'Sebutkan masing-masing 2 contoh kosakata Bahasa Mandarin (Pinyin + artinya) untuk:\na. Benda/furnitur yang ada di kamar (Bab 1)\nb. Aksesori atau alas kaki beserta warnanya menggunakan pola "Warna + de + Benda" (Bab 2)!',
+                idealAnswer: 'Contoh: a. Benda di kamar: chuáng (kasur/tempat tidur), zhěntou (bantal), yīguì (lemari baju), shūzhuō (meja belajar), jìngzi (cermin), shūbāo (tas sekolah). b. Aksesori/alas kaki + warna: hēisè de xiézi (sepatu hitam), huángsè de màozi (topi kuning), báisè de wàzi (kaos kaki putih), zōngsè de shǒubiǎo (jam tangan cokelat).',
+                explanation: 'Pastikan membedakan benda kamar Bab 1 (chuáng, zhěntou, yīguì, jìngzi, shūbāo) dengan pakaian/aksesori & warna Bab 2 (pola: Warna + de + Benda).'
+            }
+        ];
+
+        // ==================== GLOBAL APP STATE ====================
+        let currentStudySubject = 'jawa';
+        let quickQuizQuestions = [];
+        let quickQuizAnswers = {};
+        let quickQuizSubmitted = false;
+
+        // Exam Simulation State
+        let examQuestions = [];
+        let examUserAnswers = {};
+        let examRaguFlags = {};
+        let currentExamIndex = 0;
+        let examTimerInterval = null;
+        let examTimeRemaining = 0;
+        let examGradedResults = [];
+
+        // ==================== MODAL UTILITY (NO ALERT/CONFIRM) ====================
+        function showCustomModal({ title, message, iconClass = 'fa-info-circle', showCancel = false, confirmText = 'OK', onConfirm = null }) {
+            const modal = document.getElementById('customModal');
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalMessage').textContent = message;
+            document.getElementById('modalIcon').innerHTML = `<i class="fas ${iconClass}"></i>`;
+            
+            const cancelBtn = document.getElementById('modalCancelBtn');
+            const confirmBtn = document.getElementById('modalConfirmBtn');
+            
+            cancelBtn.style.display = showCancel ? 'inline-block' : 'none';
+            confirmBtn.textContent = confirmText;
+            
+            cancelBtn.onclick = () => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            };
+            
+            confirmBtn.onclick = () => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                if (onConfirm) onConfirm();
+            };
+            
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        // ==================== TAB NAVIGATION ====================
+        function switchMainTab(tabName) {
+            // Prevent accidental tab switch during active exam
+            if (!document.getElementById('examActiveInterface').classList.contains('hidden') && tabName !== 'ujian') {
+                showCustomModal({
+                    title: 'Ujian Sedang Berlangsung!',
+                    message: 'Kamu sedang berada di dalam mode Exam Browser SAS. Selesaikan ujian dan klik "Akhiri Test" terlebih dahulu sebelum pindah halaman.',
+                    iconClass: 'fa-exclamation-triangle',
+                    showCancel: false,
+                    confirmText: 'Kembali ke Ujian'
+                });
+                return;
+            }
+
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('bg-sanclar-gold', 'text-sanclar-blue', 'shadow');
+                btn.classList.add('text-blue-100', 'hover:bg-white/10');
+            });
+
+            const activeBtn = document.getElementById(`nav-${tabName}`);
+            activeBtn.classList.remove('text-blue-100', 'hover:bg-white/10');
+            activeBtn.classList.add('bg-sanclar-gold', 'text-sanclar-blue', 'shadow');
+        }
+
+        // ==================== STUDY MODULE INITIALIZATION ====================
+        function initStudyModule() {
+            const pillsContainer = document.getElementById('studySubjectPills');
+            const quizSelect = document.getElementById('quizSubjectSelect');
+            
+            pillsContainer.innerHTML = '';
+            quizSelect.innerHTML = '<option value="ALL">Semua Mata Pelajaran (Acak 10 Soal)</option>';
+
+            Object.values(SUBJECTS_DATA).forEach(subj => {
+                // Study pill
+                const btn = document.createElement('button');
+                btn.id = `pill-${subj.id}`;
+                btn.onclick = () => renderStudySubject(subj.id);
+                btn.className = 'study-pill px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold border transition flex items-center gap-2';
+                btn.innerHTML = `<span class="w-2.5 h-2.5 rounded-full ${subj.color}"></span><span>${subj.name}</span>`;
+                pillsContainer.appendChild(btn);
+
+                // Quiz dropdown option
+                const opt = document.createElement('option');
+                opt.value = subj.id;
+                opt.textContent = `${subj.name} (${subj.topic.split(':')[0]})`;
+                quizSelect.appendChild(opt);
+            });
+
+            renderStudySubject('jawa');
+            initQuickQuiz();
+        }
+
+        function renderStudySubject(subjId) {
+            currentStudySubject = subjId;
+            const data = SUBJECTS_DATA[subjId];
+
+            // Update active pill style
+            document.querySelectorAll('.study-pill').forEach(el => {
+                el.classList.remove('bg-sanclar-blue', 'text-white', 'border-sanclar-blue', 'shadow-sm');
+                el.classList.add('bg-slate-50', 'text-slate-700', 'border-slate-200', 'hover:bg-slate-100');
+            });
+            const activePill = document.getElementById(`pill-${subjId}`);
+            activePill.classList.remove('bg-slate-50', 'text-slate-700', 'border-slate-200', 'hover:bg-slate-100');
+            activePill.classList.add('bg-sanclar-blue', 'text-white', 'border-sanclar-blue', 'shadow-sm');
+
+            // Populate summary
+            document.getElementById('studyBadge').textContent = `${data.name} • Jadwal: ${data.schedule}`;
+            document.getElementById('studyTitle').textContent = data.topic;
+
+            const summaryBody = document.getElementById('studySummaryBody');
+            summaryBody.innerHTML = data.summary.map(sec => `
+                <div class="bg-slate-50/80 rounded-2xl p-4 sm:p-5 border border-slate-200/80">
+                    <h4 class="font-extrabold text-sanclar-blue text-base mb-3">${sec.title}</h4>
+                    <ul class="space-y-2.5 text-sm text-slate-700">
+                        ${sec.points.map(pt => `
+                            <li class="flex items-start gap-2.5">
+                                <span class="text-sanclar-gold mt-1"><i class="fas fa-check-circle"></i></span>
+                                <span>${pt}</span>
+                            </li>
+                        `).join('')}
+                    </ul>
+                </div>
+            `).join('');
+
+            // Populate tricks
+            const tricksBody = document.getElementById('studyTricksBody');
+            tricksBody.innerHTML = data.tricks.map(tr => `
+                <div class="bg-white/90 rounded-xl p-4 border border-amber-200 shadow-2xs">
+                    <h5 class="font-extrabold text-amber-900 text-sm mb-1.5 flex items-center gap-1.5">
+                        <i class="fas fa-key text-amber-500"></i> ${tr.title}
+                    </h5>
+                    <p class="text-xs sm:text-sm text-slate-700 leading-relaxed">${tr.content}</p>
+                </div>
+            `).join('');
+        }
+
+        function jumpToQuizFromStudy() {
+            document.getElementById('quizSubjectSelect').value = currentStudySubject;
+            initQuickQuiz();
+            switchMainTab('kuis');
+        }
+
+        // ==================== QUICK QUIZ (MULTIPLE CHOICE ONLY) ====================
+        function initQuickQuiz() {
+            const selectedSubj = document.getElementById('quizSubjectSelect').value;
+            let pool = QUESTION_BANK.filter(q => q.type === 'PG');
+            
+            if (selectedSubj !== 'ALL') {
+                pool = pool.filter(q => q.subject === selectedSubj);
+            } else {
+                // Shuffle and take 10
+                pool = [...pool].sort(() => Math.random() - 0.5).slice(0, 10);
+            }
+
+            quickQuizQuestions = pool;
+            quickQuizAnswers = {};
+            quickQuizSubmitted = false;
+            renderQuickQuiz();
+        }
+
+        function selectQuickQuizOption(qId, optValue) {
+            if (quickQuizSubmitted) return;
+            quickQuizAnswers[qId] = optValue;
+            renderQuickQuiz();
+        }
+
+        function submitQuickQuiz() {
+            if (Object.keys(quickQuizAnswers).length < quickQuizQuestions.length) {
+                showCustomModal({
+                    title: 'Belum Lengkap',
+                    message: `Kamu baru menjawab ${Object.keys(quickQuizAnswers).length} dari ${quickQuizQuestions.length} soal. Jawab semua pilihan ganda dulu ya!`,
+                    iconClass: 'fa-exclamation-circle'
+                });
+                return;
+            }
+            quickQuizSubmitted = true;
+            renderQuickQuiz();
+        }
+
+        function renderQuickQuiz() {
+            const container = document.getElementById('quickQuizContainer');
+            if (quickQuizQuestions.length === 0) {
+                container.innerHTML = '<p class="text-center text-slate-500">Soal tidak ditemukan.</p>';
+                return;
+            }
+
+            let correctCount = 0;
+            if (quickQuizSubmitted) {
+                quickQuizQuestions.forEach(q => {
+                    if (quickQuizAnswers[q.id] === q.answer) correctCount++;
+                });
+            }
+
+            let html = '';
+
+            if (quickQuizSubmitted) {
+                const score = Math.round((correctCount / quickQuizQuestions.length) * 100);
+                html += `
+                    <div class="mb-6 p-5 rounded-2xl bg-gradient-to-r from-sanclar-blue to-sanclar-lightBlue text-white flex flex-wrap items-center justify-between gap-4">
+                        <div>
+                            <span class="text-xs font-bold uppercase tracking-wider text-sanclar-gold">Hasil Kuis Singkat</span>
+                            <h3 class="text-xl font-extrabold mt-0.5">Skor Kamu: ${score} / 100</h3>
+                            <p class="text-xs text-blue-100 mt-1">Benar ${correctCount} dari ${quickQuizQuestions.length} soal pilihan ganda.</p>
+                        </div>
+                        <button onclick="initQuickQuiz()" class="px-4 py-2 rounded-xl bg-sanclar-gold text-sanclar-blue font-bold text-xs sm:text-sm hover:bg-yellow-400 transition">
+                            <i class="fas fa-redo mr-1"></i> Ulangi Kuis
+                        </button>
+                    </div>
+                `;
+            }
+
+            html += `<div class="space-y-6">`;
+            quickQuizQuestions.forEach((q, idx) => {
+                const subjName = SUBJECTS_DATA[q.subject]?.name || q.subject;
+                const userAns = quickQuizAnswers[q.id];
+
+                html += `
+                    <div class="p-5 rounded-2xl border ${quickQuizSubmitted ? (userAns === q.answer ? 'border-emerald-300 bg-emerald-50/30' : 'border-red-300 bg-red-50/30') : 'border-slate-200 bg-slate-50/50'}">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="px-2.5 py-0.5 rounded-md bg-sanclar-blue text-white text-xs font-bold">No. ${idx + 1}</span>
+                            <span class="text-xs font-semibold text-slate-500">${subjName}</span>
+                        </div>
+                        <p class="font-semibold text-slate-800 text-sm sm:text-base whitespace-pre-line mb-4">${q.question}</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                            ${q.options.map((opt, optIdx) => {
+                                const letter = ['A', 'B', 'C', 'D'][optIdx];
+                                const isSelected = userAns === opt;
+                                let btnClass = 'bg-white border-slate-200 text-slate-700 hover:border-sanclar-blue';
+                                
+                                if (!quickQuizSubmitted && isSelected) {
+                                    btnClass = 'bg-blue-50 border-sanclar-blue text-sanclar-blue ring-2 ring-sanclar-blue/20 font-bold';
+                                } else if (quickQuizSubmitted) {
+                                    if (opt === q.answer) {
+                                        btnClass = 'bg-emerald-100 border-emerald-500 text-emerald-900 font-bold';
+                                    } else if (isSelected && opt !== q.answer) {
+                                        btnClass = 'bg-red-100 border-red-500 text-red-900 line-through';
+                                    } else {
+                                        btnClass = 'bg-white border-slate-200 text-slate-400 opacity-75';
+                                    }
+                                }
+
+                                return `
+                                    <button onclick="selectQuickQuizOption('${q.id}', '${opt.replace(/'/g, "\\'")}')" 
+                                        class="text-left p-3 rounded-xl border text-xs sm:text-sm transition flex items-start gap-2.5 ${btnClass}">
+                                        <span class="w-6 h-6 rounded-lg bg-slate-100 text-slate-700 font-bold flex items-center justify-center shrink-0 text-xs">${letter}</span>
+                                        <span class="pt-0.5">${opt}</span>
+                                    </button>
+                                `;
+                            }).join('')}
+                        </div>
+                        ${quickQuizSubmitted ? `
+                            <div class="mt-4 p-3.5 rounded-xl bg-white border border-slate-200 text-xs sm:text-sm text-slate-700">
+                                <strong class="${userAns === q.answer ? 'text-emerald-600' : 'text-red-600'}">
+                                    ${userAns === q.answer ? '✅ Jawaban Benar!' : '❌ Kurang Tepat (Kunci: ' + q.answer + ')'}
+                                </strong>
+                                <p class="mt-1 text-slate-600"><strong>Pembahasan:</strong> ${q.explanation}</p>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            });
+            html += `</div>`;
+
+            if (!quickQuizSubmitted) {
+                html += `
+                    <div class="mt-6 flex justify-end">
+                        <button onclick="submitQuickQuiz()" class="px-6 py-3 rounded-xl bg-sanclar-blue hover:bg-sanclar-lightBlue text-white font-bold text-sm shadow-md transition flex items-center gap-2">
+                            <i class="fas fa-check-circle"></i> Periksa Jawaban Kuis
+                        </button>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+        }
+
+        // ==================== EXAM BROWSER SIMULATION (SAS 1) ====================
+        function startExamSimulation() {
+            const studentName = document.getElementById('studentNameInput').value.trim() || 'Peserta Didik Kelas VI';
+            const pkg = document.getElementById('examPackageSelect').value;
+
+            let selectedQuestions = [];
+            let durationMinutes = 25;
+
+            if (pkg === 'ALL') {
+                // Ambil 2 soal per mapel (16 soal total: 6 PG, 4 BS, 4 Isian, 2 Uraian)
+                const subjects = Object.keys(SUBJECTS_DATA);
+                subjects.forEach((sId, index) => {
+                    const subPool = QUESTION_BANK.filter(q => q.subject === sId);
+                    if (index % 4 === 0) {
+                        selectedQuestions.push(subPool.find(q => q.type === 'PG'), subPool.find(q => q.type === 'URAIAN'));
+                    } else if (index % 4 === 1) {
+                        selectedQuestions.push(subPool.find(q => q.type === 'PG'), subPool.find(q => q.type === 'ISIAN'));
+                    } else if (index % 4 === 2) {
+                        selectedQuestions.push(subPool.find(q => q.type === 'BS'), subPool.find(q => q.type === 'ISIAN'));
+                    } else {
+                        selectedQuestions.push(subPool.find(q => q.type === 'PG'), subPool.find(q => q.type === 'BS'));
+                    }
+                });
+                // Urutkan berdasarkan tipe soal: PG -> BS -> ISIAN -> URAIAN
+                const typeOrder = { 'PG': 1, 'BS': 2, 'ISIAN': 3, 'URAIAN': 4 };
+                selectedQuestions.sort((a, b) => typeOrder[a.type] - typeOrder[b.type]);
+                durationMinutes = 45;
+            } else {
+                selectedQuestions = QUESTION_BANK.filter(q => q.subject === pkg);
+                durationMinutes = pkg === 'matematika' ? 30 : 25;
+            }
+
+            examQuestions = selectedQuestions;
+            examUserAnswers = {};
+            examRaguFlags = {};
+            currentExamIndex = 0;
+            examTimeRemaining = durationMinutes * 60;
+
+            // Update UI Headers
+            document.getElementById('examDisplayStudentName').textContent = studentName;
+            const selectEl = document.getElementById('examPackageSelect');
+            document.getElementById('examDisplayPackage').textContent = selectEl.options[selectEl.selectedIndex].text.split('(')[0].trim();
+
+            // Switch Views
+            document.getElementById('examLobby').classList.add('hidden');
+            document.getElementById('examResultScreen').classList.add('hidden');
+            document.getElementById('examActiveInterface').classList.remove('hidden');
+
+            // Start Timer
+            clearInterval(examTimerInterval);
+            updateTimerDisplay();
+            examTimerInterval = setInterval(() => {
+                examTimeRemaining--;
+                updateTimerDisplay();
+                if (examTimeRemaining <= 0) {
+                    clearInterval(examTimerInterval);
+                    executeFinishExam();
+                }
+            }, 1000);
+
+            renderExamQuestion();
+            renderExamNavGrid();
+        }
+
+        function updateTimerDisplay() {
+            const mins = Math.floor(examTimeRemaining / 60);
+            const secs = examTimeRemaining % 60;
+            const display = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+            const timerEl = document.getElementById('examTimerDisplay');
+            timerEl.textContent = display;
+            if (examTimeRemaining < 300) {
+                timerEl.classList.add('text-red-400');
+            } else {
+                timerEl.classList.remove('text-red-400');
+            }
+        }
+
+        function renderExamQuestion() {
+            const q = examQuestions[currentExamIndex];
+            const subjName = SUBJECTS_DATA[q.subject]?.name || q.subject;
+            const typeLabels = {
+                'PG': 'Bagian A: Pilihan Ganda',
+                'BS': 'Bagian B: Benar atau Salah',
+                'ISIAN': 'Bagian C: Isian Singkat',
+                'URAIAN': 'Bagian D: Uraian'
+            };
+
+            document.getElementById('currentQNumber').textContent = currentExamIndex + 1;
+            document.getElementById('currentQTypeBadge').textContent = typeLabels[q.type];
+            document.getElementById('currentQSubjectBadge').textContent = subjName;
+            document.getElementById('raguCheckbox').checked = !!examRaguFlags[q.id];
+
+            // Prev / Next button states
+            document.getElementById('prevQBtn').disabled = currentExamIndex === 0;
+            const nextBtn = document.getElementById('nextQBtn');
+            if (currentExamIndex === examQuestions.length - 1) {
+                nextBtn.innerHTML = '<span>Selesai & Tinjau</span> <i class="fas fa-flag-checkered"></i>';
+                nextBtn.onclick = confirmFinishExam;
+            } else {
+                nextBtn.innerHTML = '<span>Selanjutnya</span> <i class="fas fa-arrow-right"></i>';
+                nextBtn.onclick = () => navigateExamQuestion(1);
+            }
+
+            const bodyEl = document.getElementById('examQuestionBody');
+            const currentVal = examUserAnswers[q.id] || '';
+
+            let inputHTML = '';
+            if (q.type === 'PG') {
+                inputHTML = `
+                    <div class="space-y-3">
+                        ${q.options.map((opt, i) => {
+                            const letter = ['A', 'B', 'C', 'D'][i];
+                            const checked = currentVal === opt;
+                            return `
+                                <label onclick="saveExamAnswer('${q.id}', '${opt.replace(/'/g, "\\'")}')" 
+                                    class="flex items-start gap-3 p-3.5 rounded-xl border-2 cursor-pointer transition ${checked ? 'border-sanclar-blue bg-blue-50/70' : 'border-slate-200 hover:border-slate-300 bg-white'}">
+                                    <span class="w-7 h-7 rounded-lg flex items-center justify-center font-extrabold text-xs shrink-0 ${checked ? 'bg-sanclar-blue text-white' : 'bg-slate-100 text-slate-600'}">${letter}</span>
+                                    <span class="text-sm sm:text-base font-medium text-slate-800 pt-0.5">${opt}</span>
+                                </label>
+                            `;
+                        }).join('')}
+                    </div>
+                `;
+            } else if (q.type === 'BS') {
+                inputHTML = `
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                        ${['Benar', 'Salah'].map(choice => {
+                            const checked = currentVal === choice;
+                            const isTrueBtn = choice === 'Benar';
+                            return `
+                                <button type="button" onclick="saveExamAnswer('${q.id}', '${choice}')"
+                                    class="p-4 rounded-2xl border-2 font-extrabold text-base flex items-center justify-center gap-3 transition ${checked ? (isTrueBtn ? 'border-emerald-600 bg-emerald-50 text-emerald-800' : 'border-red-600 bg-red-50 text-red-800') : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'}">
+                                    <i class="fas ${isTrueBtn ? 'fa-check-circle text-emerald-600' : 'fa-times-circle text-red-600'} text-xl"></i>
+                                    <span>${choice.toUpperCase()}</span>
+                                </button>
+                            `;
+                        }).join('')}
+                    </div>
+                `;
+            } else if (q.type === 'ISIAN') {
+                inputHTML = `
+                    <div class="pt-2">
+                        <label class="block text-xs font-bold uppercase text-slate-500 mb-2">Ketik Jawaban Singkatmu:</label>
+                        <input type="text" id="examTextInput" value="${currentVal.replace(/"/g, '&quot;')}" 
+                            oninput="saveExamAnswer('${q.id}', this.value, false)"
+                            placeholder="Tulis jawaban singkat di sini..."
+                            class="w-full px-4 py-3 rounded-xl border-2 border-slate-300 focus:border-sanclar-blue focus:outline-none text-base font-semibold text-slate-800">
+                        <p class="text-xs text-slate-400 mt-2"><i class="fas fa-robot mr-1"></i> Jawaban isian singkat akan dikoreksi secara cerdas oleh AI setelah ujian diakhiri.</p>
+                    </div>
+                `;
+            } else if (q.type === 'URAIAN') {
+                inputHTML = `
+                    <div class="pt-2">
+                        <label class="block text-xs font-bold uppercase text-slate-500 mb-2">Ketik Jawaban Uraian Lengkapmu:</label>
+                        <textarea id="examTextArea" rows="5"
+                            oninput="saveExamAnswer('${q.id}', this.value, false)"
+                            placeholder="Tuliskan penjelasan atau langkah penyelesaian dengan lengkap dan jelas..."
+                            class="w-full px-4 py-3 rounded-xl border-2 border-slate-300 focus:border-sanclar-blue focus:outline-none text-sm sm:text-base text-slate-800 leading-relaxed">${currentVal}</textarea>
+                        <p class="text-xs text-slate-400 mt-2"><i class="fas fa-robot mr-1"></i> Jawaban uraian akan dinilai berdasarkan kelengkapan konsep oleh AI.</p>
+                    </div>
+                `;
+            }
+
+            bodyEl.innerHTML = `
+                <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200/80">
+                    <p class="text-base sm:text-lg font-semibold text-slate-800 whitespace-pre-line leading-relaxed">${q.question}</p>
+                </div>
+                ${inputHTML}
+            `;
+
+            renderExamNavGrid();
+        }
+
+        function saveExamAnswer(qId, value, reRenderQuestion = true) {
+            if (value.trim() === '') {
+                delete examUserAnswers[qId];
+            } else {
+                examUserAnswers[qId] = value;
+            }
+            if (reRenderQuestion) {
+                renderExamQuestion();
+            } else {
+                renderExamNavGrid();
+            }
+        }
+
+        function toggleRagu() {
+            const q = examQuestions[currentExamIndex];
+            examRaguFlags[q.id] = document.getElementById('raguCheckbox').checked;
+            renderExamNavGrid();
+        }
+
+        function navigateExamQuestion(step) {
+            const nextIdx = currentExamIndex + step;
+            if (nextIdx >= 0 && nextIdx < examQuestions.length) {
+                currentExamIndex = nextIdx;
+                renderExamQuestion();
+            }
+        }
+
+        function jumpToExamQuestion(idx) {
+            currentExamIndex = idx;
+            renderExamQuestion();
+        }
+
+        function renderExamNavGrid() {
+            const grid = document.getElementById('examNavGrid');
+            let answeredCount = 0;
+
+            grid.innerHTML = examQuestions.map((q, idx) => {
+                const isAnswered = examUserAnswers[q.id] !== undefined && examUserAnswers[q.id].trim() !== '';
+                if (isAnswered) answeredCount++;
+                const isRagu = !!examRaguFlags[q.id];
+                const isCurrent = idx === currentExamIndex;
+
+                let bgClass = 'bg-slate-200 text-slate-700';
+                if (isRagu) bgClass = 'bg-amber-400 text-amber-950';
+                else if (isAnswered) bgClass = 'bg-emerald-500 text-white';
+
+                const borderClass = isCurrent ? 'ring-2 ring-offset-2 ring-sanclar-blue font-black' : 'font-bold';
+
+                return `
+                    <button onclick="jumpToExamQuestion(${idx})" class="h-10 rounded-xl text-xs transition flex items-center justify-center ${bgClass} ${borderClass}">
+                        ${idx + 1}
+                    </button>
+                `;
+            }).join('');
+
+            document.getElementById('answeredCountText').textContent = `${answeredCount} / ${examQuestions.length} Soal`;
+        }
+
+        function confirmFinishExam() {
+            const answeredCount = Object.keys(examUserAnswers).length;
+            const total = examQuestions.length;
+            const unanswered = total - answeredCount;
+
+            let msg = 'Apakah kamu yakin ingin mengakhiri test sekarang? Semua jawaban akan dikunci dan diperiksa oleh AI.';
+            if (unanswered > 0) {
+                msg = `Perhatian! Masih ada ${unanswered} soal yang belum kamu jawab. Apakah kamu tetap ingin mengakhiri test sekarang?`;
+            }
+
+            showCustomModal({
+                title: 'Akhiri Simulasi SAS 1?',
+                message: msg,
+                iconClass: 'fa-check-double',
+                showCancel: true,
+                confirmText: 'Ya, Akhiri & Periksa Nilai',
+                onConfirm: () => executeFinishExam()
+            });
+        }
+
+        // ==================== AI GRADING & REVIEW ENGINE ====================
+        async function executeFinishExam() {
+            clearInterval(examTimerInterval);
+            document.getElementById('examActiveInterface').classList.add('hidden');
+            document.getElementById('examGradingLoader').classList.remove('hidden');
+
+            // 1. Grade Objective Questions (PG & BS) Locally
+            const subjectiveItems = [];
+            const resultsMap = {};
+
+            examQuestions.forEach((q, idx) => {
+                const userAns = (examUserAnswers[q.id] || '').trim();
+                if (q.type === 'PG' || q.type === 'BS') {
+                    const isCorrect = userAns.toLowerCase() === q.answer.toLowerCase();
+                    resultsMap[q.id] = {
+                        questionObj: q,
+                        number: idx + 1,
+                        userAnswer: userAns || '(Tidak dijawab)',
+                        correctAnswer: q.answer,
+                        scoreRatio: isCorrect ? 1 : 0, // 0 to 1
+                        isCorrect: isCorrect,
+                        aiReview: isCorrect 
+                            ? `Bagus! Jawabanmu tepat. ${q.explanation}` 
+                            : `Jawabanmu (${userAns || 'kosong'}) masih kurang tepat. Kunci jawaban yang benar adalah "${q.answer}". ${q.explanation}`
+                    };
+                } else {
+                    // Prepare for Gemini AI Grading
+                    subjectiveItems.push({
+                        id: q.id,
+                        number: idx + 1,
+                        subject: SUBJECTS_DATA[q.subject]?.name || q.subject,
+                        type: q.type,
+                        question: q.question,
+                        idealAnswer: q.idealAnswer,
+                        studentAnswer: userAns || '(Tidak dijawab)'
+                    });
+                }
+            });
+
+            // 2. Call Gemini API to grade Isian Singkat & Uraian + generate friendly 6th-grade review
+            let aiEvaluations = {};
+            if (subjectiveItems.length > 0) {
+                aiEvaluations = await callGeminiForGrading(subjectiveItems);
+            }
+
+            // Merge subjective results
+            subjectiveItems.forEach(item => {
+                const q = examQuestions.find(x => x.id === item.id);
+                const aiRes = aiEvaluations[item.id];
+                
+                if (aiRes) {
+                    resultsMap[item.id] = {
+                        questionObj: q,
+                        number: item.number,
+                        userAnswer: item.studentAnswer,
+                        correctAnswer: q.idealAnswer,
+                        scoreRatio: Math.max(0, Math.min(1, aiRes.scoreRatio)),
+                        isCorrect: aiRes.scoreRatio >= 0.85,
+                        aiReview: aiRes.feedback
+                    };
+                } else {
+                    // Fallback heuristic if network unavailable
+                    const fallbackScore = fallbackGradeText(item.studentAnswer, q.idealAnswer);
+                    resultsMap[item.id] = {
+                        questionObj: q,
+                        number: item.number,
+                        userAnswer: item.studentAnswer,
+                        correctAnswer: q.idealAnswer,
+                        scoreRatio: fallbackScore,
+                        isCorrect: fallbackScore >= 0.8,
+                        aiReview: fallbackScore >= 0.8 
+                            ? `Hebat! Jawabanmu sudah sesuai dengan konsep yang diharapkan. ${q.explanation}`
+                            : `Jawabanmu masih perlu dilengkapi. Kunci jawaban idealnya: "${q.idealAnswer}". ${q.explanation}`
+                    };
+                }
+            });
+
+            examGradedResults = examQuestions.map(q => resultsMap[q.id]);
+            displayExamResults();
+        }
+
+        async function callGeminiForGrading(subjectiveItems) {
+            const apiKey = ""; // Runtime environment injects API key
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+            const systemPrompt = `Kamu adalah guru SD Katolik Santa Clara Surabaya yang ramah, sabar, dan suportif untuk siswa Kelas VI.
+Tugasmu adalah mengoreksi jawaban ISIAN SINGKAT dan URAIAN siswa pada simulasi ujian SAS 1.
+Aturan penilaian:
+1. Untuk ISIAN SINGKAT: Jika makna/kata kunci benar (meski beda huruf besar/kecil atau sedikit typo wajar anak SD), beri scoreRatio = 1.0. Jika kosong/salah, beri 0.0.
+2. Untuk URAIAN: Nilai kelengkapan poin dan ketepatan konsep dari 0.0 sampai 1.0 (misal 0.5 jika baru menjawab sebagian).
+3. Berikan "feedback" (review edukatif dalam Bahasa Indonesia yang ramah untuk siswa kelas 6 SD). Jika jawaban salah atau kurang lengkap, jelaskan letak kesalahannya dan berikan jawaban yang benar dengan jelas!`;
+
+            const userPrompt = `Koreksi daftar soal dan jawaban siswa berikut ini:\n${JSON.stringify(subjectiveItems, null, 2)}`;
+
+            const payload = {
+                contents: [{ parts: [{ text: userPrompt }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "ARRAY",
+                        items: {
+                            type: "OBJECT",
+                            properties: {
+                                id: { type: "STRING" },
+                                scoreRatio: { type: "NUMBER" },
+                                feedback: { type: "STRING" }
+                            },
+                            required: ["id", "scoreRatio", "feedback"]
+                        }
+                    }
+                }
+            };
+
+            // Exponential backoff retry
+            const delays = [1000, 2000, 4000];
+            for (let attempt = 0; attempt <= delays.length; attempt++) {
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (!response.ok) throw new Error('API Error');
+                    const result = await response.json();
+                    const text = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (text) {
+                        const parsed = JSON.parse(text);
+                        const map = {};
+                        parsed.forEach(entry => {
+                            map[entry.id] = entry;
+                        });
+                        return map;
+                    }
+                } catch (err) {
+                    if (attempt < delays.length) {
+                        await new Promise(res => setTimeout(res, delays[attempt]));
+                    }
+                }
+            }
+            return {};
+        }
+
+        function fallbackGradeText(studentAns, idealAns) {
+            if (!studentAns || studentAns === '(Tidak dijawab)') return 0;
+            const s = studentAns.toLowerCase();
+            const keywords = idealAns.toLowerCase().split(/[\s,./()]+/).filter(w => w.length > 3);
+            if (keywords.length === 0) return s.includes(idealAns.toLowerCase()) ? 1 : 0;
+            let hits = 0;
+            keywords.forEach(kw => {
+                if (s.includes(kw)) hits++;
+            });
+            const ratio = hits / keywords.length;
+            return ratio >= 0.4 ? Math.min(1, ratio + 0.3) : 0;
+        }
+
+        function displayExamResults() {
+            document.getElementById('examGradingLoader').classList.add('hidden');
+            document.getElementById('examResultScreen').classList.remove('hidden');
+
+            const studentName = document.getElementById('examDisplayStudentName').textContent;
+            document.getElementById('resultStudentTitle').textContent = `Hasil Ujian: ${studentName}`;
+
+            // Calculate weighted score (PG: 1 pt, BS: 1 pt, ISIAN: 2 pts, URAIAN: 3 pts)
+            const weights = { 'PG': 1, 'BS': 1, 'ISIAN': 2, 'URAIAN': 3 };
+            let earnedWeight = 0;
+            let totalWeight = 0;
+
+            const stats = {
+                PG: { earned: 0, total: 0 },
+                BS: { earned: 0, total: 0 },
+                ISIAN: { earned: 0, total: 0 },
+                URAIAN: { earned: 0, total: 0 }
+            };
+
+            examGradedResults.forEach(r => {
+                const t = r.questionObj.type;
+                const w = weights[t] || 1;
+                totalWeight += w;
+                earnedWeight += (r.scoreRatio * w);
+
+                stats[t].total += 1;
+                stats[t].earned += r.scoreRatio;
+            });
+
+            const finalScore = Math.round((earnedWeight / totalWeight) * 100);
+            document.getElementById('finalScoreValue').textContent = finalScore;
+
+            let predicate = 'Perlu Banyak Berlatih';
+            let summaryMsg = 'Jangan menyerah! Pelajari kembali ulasan AI di bawah ini dan coba lagi.';
+            if (finalScore >= 90) {
+                predicate = 'Sangat Memuaskan (A)';
+                summaryMsg = 'Luar biasa! Kamu sudah sangat siap menghadapi SAS 1 SD Katolik Santa Clara!';
+            } else if (finalScore >= 75) {
+                predicate = 'Baik & Tuntas (B)';
+                summaryMsg = 'Bagus sekali! Tinggal perbaiki sedikit bagian yang masih keliru di bawah ini.';
+            } else if (finalScore >= 60) {
+                predicate = 'Cukup (C)';
+                summaryMsg = 'Cukup baik, ayo baca trik hafalan cepat dan pelajari review AI di bawah ini!';
+            }
+
+            document.getElementById('finalScorePredicate').textContent = predicate;
+            document.getElementById('resultFeedbackSummary').textContent = summaryMsg;
+
+            document.getElementById('statPG').textContent = `${Math.round(stats.PG.earned)}/${stats.PG.total}`;
+            document.getElementById('statBS').textContent = `${Math.round(stats.BS.earned)}/${stats.BS.total}`;
+            document.getElementById('statIsian').textContent = `${Number(stats.ISIAN.earned.toFixed(1))}/${stats.ISIAN.total}`;
+            document.getElementById('statUraian').textContent = `${Number(stats.URAIAN.earned.toFixed(1))}/${stats.URAIAN.total}`;
+
+            // Default filter: show wrong answers first if any exist, otherwise all
+            const hasWrong = examGradedResults.some(r => !r.isCorrect);
+            filterReview(hasWrong ? 'wrong' : 'all');
+        }
+
+        function filterReview(mode) {
+            const btnWrong = document.getElementById('btnFilterWrong');
+            const btnAll = document.getElementById('btnFilterAll');
+
+            if (mode === 'wrong') {
+                btnWrong.className = 'px-3.5 py-1.5 rounded-xl text-xs font-bold bg-red-600 text-white shadow-xs';
+                btnAll.className = 'px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200';
+            } else {
+                btnAll.className = 'px-3.5 py-1.5 rounded-xl text-xs font-bold bg-sanclar-blue text-white shadow-xs';
+                btnWrong.className = 'px-3.5 py-1.5 rounded-xl text-xs font-bold bg-red-50 text-red-700 border border-red-200 hover:bg-red-100';
+            }
+
+            const filtered = mode === 'wrong' 
+                ? examGradedResults.filter(r => !r.isCorrect) 
+                : examGradedResults;
+
+            const container = document.getElementById('reviewListContainer');
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="p-8 text-center bg-emerald-50 rounded-2xl border border-emerald-200">
+                        <div class="w-12 h-12 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xl mx-auto mb-3">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <h4 class="font-extrabold text-emerald-900 text-base">Sempurna! Tidak Ada Jawaban yang Salah!</h4>
+                        <p class="text-xs sm:text-sm text-emerald-700 mt-1">Semua jawabanmu sudah benar. Klik "Tampilkan Semua Soal" untuk melihat seluruh pembahasan.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map(item => {
+                const subjName = SUBJECTS_DATA[item.questionObj.subject]?.name || item.questionObj.subject;
+                const statusBadge = item.isCorrect 
+                    ? '<span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-extrabold">✅ Tepat</span>'
+                    : (item.scoreRatio > 0 
+                        ? `<span class="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 text-xs font-extrabold">⚠️ Kurang Lengkap (${Math.round(item.scoreRatio*100)}%)</span>`
+                        : '<span class="px-2.5 py-0.5 rounded-full bg-red-100 text-red-800 text-xs font-extrabold">❌ Salah</span>');
+
+                return `
+                    <div class="p-5 rounded-2xl border ${item.isCorrect ? 'border-emerald-200 bg-emerald-50/20' : 'border-red-200 bg-red-50/20'} space-y-3">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <div class="flex items-center gap-2">
+                                <span class="px-2.5 py-0.5 rounded-md bg-slate-800 text-white text-xs font-bold">Soal No. ${item.number}</span>
+                                <span class="text-xs font-bold text-sanclar-blue">${subjName}</span>
+                                <span class="text-xs text-slate-400">• ${item.questionObj.type}</span>
+                            </div>
+                            ${statusBadge}
+                        </div>
+
+                        <p class="text-sm sm:text-base font-semibold text-slate-800 whitespace-pre-line">${item.questionObj.question}</p>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm">
+                            <div class="p-3 rounded-xl bg-white border border-slate-200">
+                                <span class="block text-[11px] font-bold uppercase text-slate-400 mb-0.5">Jawaban Kamu:</span>
+                                <span class="font-semibold ${item.isCorrect ? 'text-emerald-700' : 'text-red-700'}">${item.userAnswer}</span>
+                            </div>
+                            <div class="p-3 rounded-xl bg-white border border-slate-200">
+                                <span class="block text-[11px] font-bold uppercase text-slate-400 mb-0.5">Kunci / Jawaban Ideal:</span>
+                                <span class="font-semibold text-slate-800">${item.correctAnswer}</span>
+                            </div>
+                        </div>
+
+                        <div class="p-3.5 rounded-xl bg-blue-50/80 border border-blue-200 text-xs sm:text-sm text-slate-700 flex items-start gap-2.5">
+                            <i class="fas fa-robot text-sanclar-blue mt-1 shrink-0"></i>
+                            <div>
+                                <strong class="text-sanclar-blue">Review Guru AI:</strong>
+                                <p class="mt-0.5 leading-relaxed">${item.aiReview}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function resetExamToLobby() {
+            document.getElementById('examResultScreen').classList.add('hidden');
+            document.getElementById('examActiveInterface').classList.add('hidden');
+            document.getElementById('examLobby').classList.remove('hidden');
+        }
+
+        // ==================== BOOTSTRAP ====================
+        window.onload = function() {
+            initStudyModule();
+        };
+    </script>
+</body>
+</html>
